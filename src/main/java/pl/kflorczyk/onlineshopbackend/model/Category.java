@@ -1,6 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Category {
@@ -12,7 +13,11 @@ public class Category {
     private String name;
 
     @OneToOne
+    @JoinColumn(name = "parent_id")
     private Category parent;
+
+//    @OneToMany(mappedBy = "category")
+//    private List<Product> products;
 
     public Category() {}
 

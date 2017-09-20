@@ -1,17 +1,25 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class User {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue
     private long ID;
 
     @Column(nullable = false, unique = true)
     private String email;
 
     private String password;
+
+    @OneToMany
+    @JoinColumn(name = "user_id")
+    private List<UserAddress> addresses;
+
+//    @OneToMany
+//    private List<Order> zamowienies;
 
     public User() {}
 

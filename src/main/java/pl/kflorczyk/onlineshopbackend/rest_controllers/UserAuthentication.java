@@ -3,6 +3,7 @@ package pl.kflorczyk.onlineshopbackend.rest_controllers;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,15 +28,7 @@ public class UserAuthentication {
     public String test() {// todo:remove
         ObjectNode node = JsonNodeFactory.instance.objectNode();
 
-//        List<Category> list = categoryRepository.findAll();
-//        ArrayNode array = node.putArray("categories");
-//        for(Category c : list) {
-//            array.addObject().
-//                    put("id", c.getID())
-//                    .put("name", c.getName())
-//                    .put("parent", c.getParent() == null ? "null" : (String.format("id: %d; name: %s",
-//                            c.getParent().getID(), c.getParent().getName())));
-//        }
+
         return node.toString();
     }
 

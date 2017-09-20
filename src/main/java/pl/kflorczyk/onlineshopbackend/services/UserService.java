@@ -19,7 +19,7 @@ public class UserService {
     }
 
     public void createUser(User user) {
-        userRepository.saveAndFlush(user);
+        userRepository.save(user);
     }
 
     public User getUser(String email) {
