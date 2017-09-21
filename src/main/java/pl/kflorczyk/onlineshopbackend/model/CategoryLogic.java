@@ -1,10 +1,9 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
-public class Category {
+public class CategoryLogic {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -12,14 +11,12 @@ public class Category {
 
     private String name;
 
-    @OneToOne
-    @JoinColumn(name = "parent_id")
-    private Category parent;
+//    @OneToOne
+//    @JoinColumn(name = "parent_id")
+//    private CategoryLogic parent;
 
-//    @OneToMany(mappedBy = "category")
-//    private List<Product> products;
 
-    public Category() {}
+    public CategoryLogic() {}
 
     public long getID() {
         return ID;
@@ -37,7 +34,7 @@ public class Category {
         this.name = name;
     }
 
-    public Category getParent() {
-        return parent;
-    }
+//    public CategoryLogic getParent() {
+//        return parent;
+//    }
 }

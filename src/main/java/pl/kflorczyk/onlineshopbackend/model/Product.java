@@ -2,6 +2,7 @@ package pl.kflorczyk.onlineshopbackend.model;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 public class Product {
@@ -18,6 +19,14 @@ public class Product {
     private String description;
 
     @OneToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @JoinColumn(name = "category_logic_id")
+    private CategoryLogic categoryLogic;
+
+//    @OneToMany
+//    @JoinColumn(name = "product_id")
+//    private List<Feature> features;
+
+    @OneToMany
+    @JoinColumn(name = "product_id")
+    private List<FeatureValue> features;
 }

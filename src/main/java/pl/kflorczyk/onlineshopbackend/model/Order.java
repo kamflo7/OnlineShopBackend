@@ -23,4 +23,7 @@ public class Order {
     @JoinColumn(name = "order_id")
     private List<OrderProduct> orderProducts;
 
+    @OneToOne
+    @JoinColumn(name = "user_address_id")
+    private UserAddress userAddress;
 }

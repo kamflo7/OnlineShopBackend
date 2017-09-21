@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import pl.kflorczyk.onlineshopbackend.model.Category;
+import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
 import pl.kflorczyk.onlineshopbackend.services.CategoriesService;
 
 @RestController
@@ -22,12 +22,12 @@ public class Categories {
 
         ArrayNode categories = node.putArray("categories");
 
-        for(Category category : categoriesService.getCategories()) {
-            ObjectNode jsonNode = categories.addObject();
-            jsonNode.put("name", category.getName());
-            jsonNode.put("id", category.getID());
-            jsonNode.put("parent_id", category.getParent() == null ? -1 : category.getParent().getID());
-        }
+//        for(CategoryLogic categoryLogic : categoriesService.getCategories()) {
+//            ObjectNode jsonNode = categories.addObject();
+//            jsonNode.put("name", categoryLogic.getName());
+//            jsonNode.put("id", categoryLogic.getID());
+//            jsonNode.put("parent_id", categoryLogic.getParent() == null ? -1 : categoryLogic.getParent().getID());
+//        }
 
         return node.toString();
     }
