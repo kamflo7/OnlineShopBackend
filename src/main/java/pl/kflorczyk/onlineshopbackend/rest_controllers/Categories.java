@@ -7,14 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
-import pl.kflorczyk.onlineshopbackend.services.CategoriesService;
+import pl.kflorczyk.onlineshopbackend.services.CategoryService;
 
 @RestController
 public class Categories {
 
     @Autowired
-    private CategoriesService categoriesService;
+    private CategoryService categoryService;
 
     @RequestMapping(path = "/categories", method = RequestMethod.GET)
     public String getCategories() {
@@ -22,7 +21,7 @@ public class Categories {
 
         ArrayNode categories = node.putArray("categories");
 
-//        for(CategoryLogic categoryLogic : categoriesService.getCategories()) {
+//        for(CategoryLogic categoryLogic : categoryService.getCategories()) {
 //            ObjectNode jsonNode = categories.addObject();
 //            jsonNode.put("name", categoryLogic.getName());
 //            jsonNode.put("id", categoryLogic.getID());

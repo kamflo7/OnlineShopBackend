@@ -7,15 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import pl.kflorczyk.onlineshopbackend.model.Product;
-import pl.kflorczyk.onlineshopbackend.services.CategoriesService;
+import pl.kflorczyk.onlineshopbackend.repository.ProductRepository;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
-
-import java.util.List;
 
 
 @RestController
 public class Products {
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @Autowired
     private ProductService productService;
@@ -26,7 +26,9 @@ public class Products {
 
         ArrayNode categories = node.putArray("products");
 
-        List<Product> products =  productService.getProducts();
+        productRepository.insertCategoryLogic("Testowa");
+
+//        List<Product> products =  productService.getProducts();
 
 //        for(CategoryLogic categoryLogic : categoriesService.getCategories()) {
 //            ObjectNode jsonNode = categories.addObject();

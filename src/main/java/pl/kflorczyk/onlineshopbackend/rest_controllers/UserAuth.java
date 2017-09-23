@@ -3,12 +3,12 @@ package pl.kflorczyk.onlineshopbackend.rest_controllers;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.User;
 import pl.kflorczyk.onlineshopbackend.services.JwtService;
 import pl.kflorczyk.onlineshopbackend.services.UserService;
@@ -17,7 +17,7 @@ import pl.kflorczyk.onlineshopbackend.validators.EmailValidator;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-public class UserAuthentication {
+public class UserAuth {
 
     @Autowired private UserService userService;
     @Autowired private JwtService jwtService;
@@ -38,26 +38,18 @@ public class UserAuthentication {
                            HttpServletResponse response) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
 
-        if(!EmailValidator.validate(email))
-            return node.put("status", "failure")
-                        .put("description", "email invalid").toString();
-
-        if(!userService.isUserExists(email)) {
-            User user = new User();
-            user.setEmail(email);
-            user.setPassword(passwordEncoder.encode(password));
-
-            userService.createUser(user);
+        try {
+            User user = userService.registerUser(email, password);
             response.setHeader("Token", jwtService.tokenFor(user));
-
-            System.out.println(String.format("UserService::createUser -> [%d '%s' rawPass: '%s'; encoded: '%s']",
-                    user.getID(), user.getEmail(), password, user.getPassword()));
-
-            return node.put("status", "success").toString();
-        } else {
-            return node.put("status", "failure")
-                        .put("description", "user already exists").toString();
+        } catch(InvalidEmailException e) {
+            return node.put("status", "failure").put("description", "invalid email").toString();
+        } catch(EmailAlreadyExistsException e) {
+            return node.put("status", "failure").put("description", "email already taken").toString();
+        } catch(InvalidPasswordException e) {
+            return node.put("status", "failure").put("description", "invalid password").toString();
         }
+
+        return node.put("status", "success").toString();
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
@@ -65,21 +57,18 @@ public class UserAuthentication {
                         @RequestParam(value = "password") String password,
                         HttpServletResponse response) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        System.out.println(String.format("UserAuthentication::login '%s' with raw '%s' -> '%s'",
-                email, password, passwordEncoder.encode(password)));
 
-        User user = userService.getUser(email);
+//        System.out.println(String.format("UserAuth::login '%s' with raw '%s' -> '%s'",
+//                email, password, passwordEncoder.encode(password)));
 
-        if(user == null)
-            return node.put("status","failure")
-                    .put("description", "user not found").toString();
-
-
-        if(!passwordEncoder.matches(password, user.getPassword()))
-            return node.put("status","failure")
-                    .put("description", "incorrect password").toString();
-
-        response.setHeader("Token", jwtService.tokenFor(user));
+        try {
+            User user = userService.loginUser(email, password);
+            response.setHeader("Token", jwtService.tokenFor(user));
+        } catch (UserNotFoundException e) {
+            return node.put("status", "failure").put("description", "user not found").toString();
+        } catch (PasswordNotMatchException e) {
+            return node.put("status", "failure").put("description", "incorrect password").toString();
+        }
 
         return node.put("status","success").toString();
     }

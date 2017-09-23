@@ -22,10 +22,6 @@ public class Product {
     @JoinColumn(name = "category_logic_id")
     private CategoryLogic categoryLogic;
 
-//    @OneToMany
-//    @JoinColumn(name = "product_id")
-//    private List<Feature> features;
-
     @OneToMany
     @JoinColumn(name = "product_id")
     private List<FeatureValue> features;

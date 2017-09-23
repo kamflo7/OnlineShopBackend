@@ -6,6 +6,6 @@ import pl.kflorczyk.onlineshopbackend.model.CategoryView;
 
 import java.util.List;
 
-public interface CategoriesViewRepository extends CrudRepository<CategoryView, Long> {
+public interface CategoryViewRepository extends CrudRepository<CategoryView, Long> {
     List<CategoryView> findAll();
 }
