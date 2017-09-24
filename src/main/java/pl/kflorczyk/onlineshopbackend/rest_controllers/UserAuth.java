@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.User;
 import pl.kflorczyk.onlineshopbackend.services.JwtService;
@@ -32,11 +29,13 @@ public class UserAuth {
         return node.toString();
     }
 
-    @RequestMapping(path = "/register", method = RequestMethod.POST)
+//    @RequestMapping(path = "/register", method = RequestMethod.POST)
+    @PostMapping("/register")
     public String register(@RequestParam(value = "email") String email,
                            @RequestParam(value = "password") String password,
                            HttpServletResponse response) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
+
 
         try {
             User user = userService.registerUser(email, password);

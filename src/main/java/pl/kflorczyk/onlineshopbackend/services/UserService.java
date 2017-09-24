@@ -26,7 +26,7 @@ public class UserService {
         return userRepository.findByEmail(email) != null;
     }
 
-    public User registerUser(String email, String password) throws InvalidEmailException, EmailAlreadyExistsException, InvalidPasswordException {
+    public User registerUser(String email, String password) {
         if(userExists(email)) {
             throw new EmailAlreadyExistsException("Email already exists");
         }
@@ -41,12 +41,13 @@ public class UserService {
 
         User user = new User();
         user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
 
         return user;
     }
 
-    public User loginUser(String email, String password) throws UserNotFoundException, PasswordNotMatchException {
+    public User loginUser(String email, String password) {
         User user = getUser(email);
 
         if(user == null) {

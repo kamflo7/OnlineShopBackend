@@ -36,4 +36,6 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')
 	testCompile group: 'com.h2database', name: 'h2', version: '1.4.196'
+	testCompile group: 'org.skyscreamer', name: 'jsonassert', version: '1.2.3'
+
 }
