@@ -13,7 +13,7 @@ public class Filter {
     private long id;
 
     @OneToOne
-    private Feature feature;
+    private FeatureDefinition featureDefinition;
 
     private String customType;
     private String customExpression;

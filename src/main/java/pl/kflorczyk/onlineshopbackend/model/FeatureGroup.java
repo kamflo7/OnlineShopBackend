@@ -14,4 +14,20 @@ public class FeatureGroup {
     private CategoryLogic categoryLogic;
 
     private String name;
+
+    public CategoryLogic getCategoryLogic() {
+        return categoryLogic;
+    }
+
+    public void setCategoryLogic(CategoryLogic categoryLogic) {
+        this.categoryLogic = categoryLogic;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

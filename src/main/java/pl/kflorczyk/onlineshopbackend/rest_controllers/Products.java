@@ -26,7 +26,6 @@ public class Products {
 
         ArrayNode categories = node.putArray("products");
 
-        productRepository.insertCategoryLogic("Testowa");
 
 //        List<Product> products =  productService.getProducts();
 

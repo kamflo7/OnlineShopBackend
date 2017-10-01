@@ -18,9 +18,6 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<UserAddress> addresses;
 
-//    @OneToMany
-//    private List<Order> zamowienies;
-
     public User() {}
 
     public User(long ID, String email, String password) {

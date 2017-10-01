@@ -25,17 +25,16 @@ public class UserAuth {
     public String test() {// todo:remove
         ObjectNode node = JsonNodeFactory.instance.objectNode();
 
+        node.put("test", "some value");
 
         return node.toString();
     }
 
-//    @RequestMapping(path = "/register", method = RequestMethod.POST)
     @PostMapping("/register")
     public String register(@RequestParam(value = "email") String email,
                            @RequestParam(value = "password") String password,
                            HttpServletResponse response) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-
 
         try {
             User user = userService.registerUser(email, password);
@@ -56,9 +55,6 @@ public class UserAuth {
                         @RequestParam(value = "password") String password,
                         HttpServletResponse response) {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-
-//        System.out.println(String.format("UserAuth::login '%s' with raw '%s' -> '%s'",
-//                email, password, passwordEncoder.encode(password)));
 
         try {
             User user = userService.loginUser(email, password);

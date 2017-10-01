@@ -3,7 +3,7 @@ package pl.kflorczyk.onlineshopbackend.model;
 import javax.persistence.*;
 
 @Entity
-public class Feature {
+public class FeatureDefinition {
 
     @Id
     @GeneratedValue

@@ -11,7 +11,7 @@ public class FeatureValue {
 
     @OneToOne
     @JoinColumn(name = "feature_id")
-    private Feature feature;
+    private FeatureDefinition featureDefinition;
 
     private String value;
 }

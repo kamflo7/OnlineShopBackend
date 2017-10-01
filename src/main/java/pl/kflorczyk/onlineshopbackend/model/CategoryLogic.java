@@ -18,6 +18,10 @@ public class CategoryLogic {
 
     public CategoryLogic() {}
 
+    public CategoryLogic(String name) {
+        this.name = name;
+    }
+
     public long getID() {
         return ID;
     }
