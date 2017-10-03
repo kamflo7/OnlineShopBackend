@@ -2,6 +2,7 @@ package pl.kflorczyk.onlineshopbackend.model;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,13 +20,20 @@ public class Product {
     @Column(columnDefinition = "text")
     private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_logic_id")
     private CategoryLogic categoryLogic;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
-    private List<FeatureValue> features;
+    private List<Feature> features = new ArrayList<>();
+
+    public void addFeature(Feature feature) throws UnsupportedOperationException {
+//        if(feature.getFeatureDefinition().getCategoryLogic().getID() != this.categoryLogic.getID())
+//            throw new UnsupportedOperationException("This feature does not belong to this product category");
+
+        this.features.add(feature);
+    }
 
     public Product() {}
 
@@ -76,11 +84,7 @@ public class Product {
         this.categoryLogic = categoryLogic;
     }
 
-    public List<FeatureValue> getFeatures() {
+    public List<Feature> getFeatures() {
         return features;
-    }
-
-    public void setFeatures(List<FeatureValue> features) {
-        this.features = features;
     }
 }

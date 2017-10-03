@@ -1,6 +1,8 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class CategoryLogic {
@@ -11,10 +13,21 @@ public class CategoryLogic {
 
     private String name;
 
-//    @OneToOne
-//    @JoinColumn(name = "parent_id")
-//    private CategoryLogic parent;
+    @OneToMany(mappedBy = "categoryLogic", cascade = CascadeType.ALL)
+    private List<FeatureDefinition> featureDefinitions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "categoryLogic", cascade = CascadeType.ALL)
+    private List<FeatureGroup> featureGroups = new ArrayList<>();
+
+    public void addFeatureGroup(FeatureGroup featureGroup) {
+        featureGroup.setCategoryLogic(this);
+        this.featureGroups.add(featureGroup);
+    }
+
+    public void addFeatureDefinition(FeatureDefinition featureDefinition) {
+        featureDefinition.setCategoryLogic(this);
+        this.featureDefinitions.add(featureDefinition);
+    }
 
     public CategoryLogic() {}
 
@@ -38,7 +51,11 @@ public class CategoryLogic {
         this.name = name;
     }
 
-//    public CategoryLogic getParent() {
-//        return parent;
-//    }
+    public List<FeatureDefinition> getFeatureDefinitions() {
+        return featureDefinitions;
+    }
+
+    public List<FeatureGroup> getFeatureGroups() {
+        return featureGroups;
+    }
 }

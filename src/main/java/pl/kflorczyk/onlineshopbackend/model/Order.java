@@ -11,12 +11,10 @@ public class Order {
     @GeneratedValue
     private long ID;
 
-//    @OneToOne
-//    private User user;
-
     private Date date;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany

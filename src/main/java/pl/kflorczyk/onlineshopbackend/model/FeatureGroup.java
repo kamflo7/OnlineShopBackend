@@ -9,18 +9,20 @@ public class FeatureGroup {
     @GeneratedValue
     private long id;
 
-    @OneToOne
+    private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_logic_id")
     private CategoryLogic categoryLogic;
 
-    private String name;
+    public FeatureGroup() { }
 
-    public CategoryLogic getCategoryLogic() {
-        return categoryLogic;
+    public FeatureGroup(String name) {
+        this.name = name;
     }
 
-    public void setCategoryLogic(CategoryLogic categoryLogic) {
-        this.categoryLogic = categoryLogic;
+    public long getId() {
+        return id;
     }
 
     public String getName() {
@@ -29,5 +31,9 @@ public class FeatureGroup {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setCategoryLogic(CategoryLogic categoryLogic) {
+        this.categoryLogic = categoryLogic;
     }
 }

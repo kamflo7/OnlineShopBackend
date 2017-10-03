@@ -5,9 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
-import pl.kflorczyk.onlineshopbackend.model.FeatureGroup;
-import pl.kflorczyk.onlineshopbackend.model.Product;
+import pl.kflorczyk.onlineshopbackend.model.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,56 +25,58 @@ public class ProductRepositoryTests {
     @Autowired
     private FeatureGroupRepository featureGroupRepository;
 
+    @Autowired
+    private FeatureDefinitionRepository featureDefinitionRepository;
+
     @Test
     public void relationTest() {
-        CategoryLogic categoryLogic = new CategoryLogic("Smartphones");
+        // prepare structure - CategoryLogic, its FeatureDefinitions, FeatureGroups
+        CategoryLogic categoryLogicSmartphones = new CategoryLogic("Smartfony");
+        FeatureGroup featureGroup = new FeatureGroup("Informacje techniczne");
 
-        FeatureGroup featureGroup = new FeatureGroup();
-        featureGroup.setCategoryLogic(categoryLogic);
-        featureGroup.setName("Podstawowe informacje");
+        FeatureDefinition featureDefCpu = new FeatureDefinition("Procesor", featureGroup);
+        FeatureDefinition featureDefRAM = new FeatureDefinition("Pamięć RAM", featureGroup);
+        FeatureDefinition featureDefInternalStorage = new FeatureDefinition("Pamięć wewnętrzna", featureGroup);
 
-        Product product = new Product("Xiaomi Redmi Note 4", new BigDecimal("980"), 100, "Najnowszy model od Xiaomi");
-        product.setCategoryLogic(categoryLogic);
+        categoryLogicSmartphones.addFeatureGroup(featureGroup);
 
+        categoryLogicSmartphones.addFeatureDefinition(featureDefCpu);
+        categoryLogicSmartphones.addFeatureDefinition(featureDefRAM);
+        categoryLogicSmartphones.addFeatureDefinition(featureDefInternalStorage);
 
-        // ####
+        categoryLogicRepository.saveAndFlush(categoryLogicSmartphones);
 
-        categoryLogicRepository.save(categoryLogic);
-        categoryLogicRepository.flush();
+        // make a Product
+        CategoryLogic obtainCategory = categoryLogicRepository.findByName("Smartfony");
+        List<FeatureDefinition> obtainFeatureDefinitions = obtainCategory.getFeatureDefinitions();
+        List<FeatureGroup> obtainFeatureGroups = obtainCategory.getFeatureGroups();
 
-        featureGroupRepository.save(featureGroup);
-        featureGroupRepository.flush();
-
-        productRepository.save(product);
-        productRepository.flush();
-
-
-        Product obtain = productRepository.findByName("Xiaomi Redmi Note 4");
-
-        assertThat(obtain.getName()).isEqualTo(product.getName());
-        assertThat(obtain.getCategoryLogic().getName()).isEqualTo(categoryLogic.getName());
-
-    }
-
-    @Test
-    public void some() {
-        CategoryLogic categoryLogic = new CategoryLogic("Smartphones");
+        assertThat(obtainCategory.getName()).isEqualTo(categoryLogicSmartphones.getName());
+        assertThat(obtainFeatureDefinitions).containsSequence(featureDefCpu, featureDefRAM, featureDefInternalStorage);
+        assertThat(obtainFeatureGroups).contains(featureGroup);
 
         Product product = new Product("Xiaomi Redmi Note 4", new BigDecimal("980"), 100, "Najnowszy model od Xiaomi");
-        product.setCategoryLogic(categoryLogic);
+        product.setCategoryLogic(categoryLogicSmartphones);
 
-        Product product2 = new Product("Huawei P9 Lite", new BigDecimal("1980"), 150, "AAAAA model od Xiaomi");
-        product2.setCategoryLogic(categoryLogic);
+        Feature featureCPU = new Feature(featureDefCpu, "Snapdragon 635");
+        Feature featureRAM = new Feature(featureDefRAM, "4GB");
+        Feature featureInternalStorage = new Feature(featureDefInternalStorage, "32GB");
 
-        categoryLogicRepository.save(categoryLogic);
-        categoryLogicRepository.flush();
-
+        product.addFeature(featureCPU);
+        product.addFeature(featureRAM);
+        product.addFeature(featureInternalStorage);
         productRepository.save(product);
-        productRepository.save(product2);
-        productRepository.flush();
+        // end of making a Product
 
-        List<Product> products = productRepository.findAll();
+        Product obtainProduct = productRepository.findByName("Xiaomi Redmi Note 4");
+        List<Feature> obtainProductFeatures = obtainProduct.getFeatures();
 
-        assertThat(products.size()).isEqualTo(2);
+        assertThat(obtainProduct.getName()).isEqualTo(product.getName());
+        assertThat(obtainProductFeatures).containsSequence(featureCPU, featureRAM, featureInternalStorage);
+
+        for(Feature f : obtainProductFeatures) {
+            assertThat(f.getFeatureDefinition().getCategoryLogic()).isEqualTo(obtainCategory);
+            assertThat(f.getFeatureDefinition().getFeatureGroup()).isEqualTo(obtainCategory.getFeatureGroups().get(0));
+        }
     }
 }

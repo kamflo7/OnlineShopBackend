@@ -9,7 +9,7 @@ public class OrderProduct {
     @GeneratedValue
     private long ID;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 

@@ -18,6 +18,13 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<UserAddress> addresses;
 
+//    @OneToMany
+//    @JoinColumn(name = "user_id")
+//    private List<Order> orders;
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders;
+
     public User() {}
 
     public User(long ID, String email, String password) {
