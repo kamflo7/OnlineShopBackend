@@ -25,4 +25,8 @@ public class Feature {
         this.featureDefinition = featureDefinition;
         this.value = value;
     }
+
+    public String getValue() {
+        return value;
+    }
 }

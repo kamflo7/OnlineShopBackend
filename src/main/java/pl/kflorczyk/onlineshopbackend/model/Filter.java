@@ -1,21 +1,15 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import pl.kflorczyk.onlineshopbackend.filter_products.FilterParameter;
+
+import javax.persistence.*;
 
 @Entity
-public class Filter {
-
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Filter {
     @Id
     @GeneratedValue
     private long id;
 
-    @OneToOne
-    private FeatureDefinition featureDefinition;
-
-    private String customType;
-    private String customExpression;
-    // todo: moze jakis enum na powyzsze?
+    public abstract boolean isSuitable(Feature feature, FilterParameter filterValue);
 }

@@ -16,6 +16,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Product findByName(String name);
 
+    List<Product> findByCategoryLogic(CategoryLogic categoryLogic);
+
 //    @Modifying
 //    @Query(value = "INSERT INTO category_logic (name) VALUES (:name)", nativeQuery = true)
 //    @Transactional

@@ -17,7 +17,19 @@ public class FeatureDefinition {
     @JoinColumn(name = "category_logic_id")
     private CategoryLogic categoryLogic;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "filter_id")
+    private Filter filter;
+
     private String name;
+
+    public void setFilter(Filter filter) {
+        this.filter = filter;
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
 
     public FeatureDefinition() {}
 
