@@ -37,11 +37,12 @@ public class Product {
 
     public Product() {}
 
-    public Product(String name, BigDecimal price, int amount, String description) {
+    public Product(String name, BigDecimal price, int amount, String description, CategoryLogic categoryLogic) {
         this.name = name;
         this.price = price;
         this.amount = amount;
         this.description = description;
+        this.categoryLogic = categoryLogic;
     }
 
     public String getName() {

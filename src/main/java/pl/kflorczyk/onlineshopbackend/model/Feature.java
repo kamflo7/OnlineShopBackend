@@ -1,6 +1,8 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Feature {
@@ -13,7 +15,8 @@ public class Feature {
     @JoinColumn(name = "feature_definition_id")
     private FeatureDefinition featureDefinition;
 
-    private String value;
+    @ManyToMany(mappedBy = "features", cascade = CascadeType.ALL)
+    private List<FeatureValue> featureValues = new ArrayList<>();
 
     public FeatureDefinition getFeatureDefinition() {
         return featureDefinition;
@@ -21,12 +24,22 @@ public class Feature {
 
     public Feature() {}
 
-    public Feature(FeatureDefinition featureDefinition, String value) {
+    public Feature(FeatureDefinition featureDefinition, FeatureValue featureValue) {
         this.featureDefinition = featureDefinition;
-        this.value = value;
+        featureValues = new ArrayList<>(1);
+        featureValues.add(featureValue);
     }
 
-    public String getValue() {
-        return value;
+    public Feature(FeatureDefinition featureDefinition, List<FeatureValue> featureValues) {
+        this.featureDefinition = featureDefinition;
+        this.featureValues = featureValues;
+    }
+
+    public List<FeatureValue> getFeatureValues() {
+        return featureValues;
+    }
+
+    public void addValue(FeatureValue value) {
+        featureValues.add(value);
     }
 }

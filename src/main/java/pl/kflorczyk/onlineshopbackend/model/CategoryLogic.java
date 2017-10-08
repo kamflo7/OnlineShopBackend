@@ -35,11 +35,17 @@ public class CategoryLogic {
         this.name = name;
     }
 
+    public static CategoryLogic ofID(long id) {
+        CategoryLogic categoryLogic = new CategoryLogic();
+        categoryLogic.setID(id);
+        return categoryLogic;
+    }
+
     public long getID() {
         return ID;
     }
 
-    public void setID(long ID) {
+    private void setID(long ID) {
         this.ID = ID;
     }
 
