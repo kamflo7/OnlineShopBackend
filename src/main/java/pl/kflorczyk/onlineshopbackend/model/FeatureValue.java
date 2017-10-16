@@ -1,6 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,8 +13,9 @@ public class FeatureValue {
 
     private String value;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<Feature> features;
+//    @ManyToMany(cascade = CascadeType.ALL)
+//    private List<Feature> features = new ArrayList<>(); // todo: remove this or something; It was NOT planned
+    // but I did this, because I thought it is impossible to do ManyToMany relationship without bidirectional
 
     public FeatureValue() {}
 
@@ -42,4 +44,5 @@ public class FeatureValue {
     public void setValue(String value) {
         this.value = value;
     }
+
 }

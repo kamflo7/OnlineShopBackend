@@ -88,4 +88,9 @@ public class Product {
     public List<Feature> getFeatures() {
         return features;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%d:%s", ID, name);
+    }
 }

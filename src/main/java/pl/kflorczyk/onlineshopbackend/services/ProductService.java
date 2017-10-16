@@ -9,7 +9,6 @@ import pl.kflorczyk.onlineshopbackend.repository.ProductRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 public class ProductService {
@@ -73,9 +72,6 @@ public class ProductService {
 
                         if(!isPresent)
                             return false;
-//                        if(!entry.getValue().contains(featureValue)) {
-//                            return false;
-//                        }
                     }
                 }
             }

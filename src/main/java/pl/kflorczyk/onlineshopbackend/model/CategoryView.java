@@ -22,5 +22,8 @@ public class CategoryView {
 
     @OneToMany
     @JoinColumn(name = "category_view_id")
-    private List<CategoryViewFilter> filters;
+    private List<FeatureValue> filters;
+//    @OneToMany
+//    @JoinColumn(name = "category_view_id")
+//    private List<CategoryViewFilter> filters;
 }

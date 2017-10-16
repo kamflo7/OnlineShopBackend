@@ -21,7 +21,7 @@ public class FeatureDefinition {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "feature_definition_id")
-    private List<FeatureValue> featureValueDefinitions;
+    private List<FeatureValue> featureValueDefinitions = new ArrayList<>();
 
     private boolean multipleValues;
 
@@ -94,5 +94,10 @@ public class FeatureDefinition {
 
     public void setFeatureValueDefinitions(List<FeatureValue> featureValueDefinitions) {
         this.featureValueDefinitions = featureValueDefinitions;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%d:%s", id, name);
     }
 }
