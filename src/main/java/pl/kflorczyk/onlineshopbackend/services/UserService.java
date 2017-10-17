@@ -5,11 +5,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.User;
-import pl.kflorczyk.onlineshopbackend.repository.UserRepository;
+import pl.kflorczyk.onlineshopbackend.repositoriesAndServices.UserRepository;
 import pl.kflorczyk.onlineshopbackend.validators.EmailValidator;
 import pl.kflorczyk.onlineshopbackend.validators.PasswordValidator;
-
-import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class UserService {

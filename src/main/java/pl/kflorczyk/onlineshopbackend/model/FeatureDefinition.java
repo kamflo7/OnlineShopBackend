@@ -11,7 +11,7 @@ public class FeatureDefinition {
     @GeneratedValue
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // todo: for sure it has appropriate cascade type?
     @JoinColumn(name = "feature_group_id")
     private FeatureGroup featureGroup;
 
@@ -29,6 +29,8 @@ public class FeatureDefinition {
 
     private boolean filterable;
 
+    private boolean visible;
+
     public FeatureDefinition() {}
 
     public FeatureDefinition(String name, FeatureGroup featureGroup) {
@@ -40,10 +42,15 @@ public class FeatureDefinition {
     }
 
     public FeatureDefinition(String name, FeatureGroup featureGroup, boolean filterable, boolean multipleValues) {
+        this(name, featureGroup, filterable, multipleValues, true);
+    }
+
+    public FeatureDefinition(String name, FeatureGroup featureGroup, boolean filterable, boolean multipleValues, boolean visible) {
         this.name = name;
         this.featureGroup = featureGroup;
         this.filterable = filterable;
         this.multipleValues = multipleValues;
+        this.visible = visible;
     }
 
     public static FeatureDefinition ofID(long id) {

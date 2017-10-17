@@ -1,4 +1,4 @@
-package pl.kflorczyk.onlineshopbackend.repository;
+package pl.kflorczyk.onlineshopbackend.repositoriesAndServices;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

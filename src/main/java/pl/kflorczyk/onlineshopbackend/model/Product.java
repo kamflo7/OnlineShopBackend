@@ -26,14 +26,18 @@ public class Product {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
-    private List<Feature> features = new ArrayList<>();
+    private List<FeatureBag> featureBags = new ArrayList<>();
 
-    public void addFeature(Feature feature) throws UnsupportedOperationException {
-//        if(feature.getFeatureDefinition().getCategoryLogic().getID() != this.categoryLogic.getID())
-//            throw new UnsupportedOperationException("This feature does not belong to this product category");
+    public void addFeature(FeatureBag featureBag) throws UnsupportedOperationException {
+//        if(featureBag.getFeatureDefinition().getCategoryLogic().getID() != this.categoryLogic.getID())
+//            throw new UnsupportedOperationException("This featureBag does not belong to this product category");
 
-        this.features.add(feature);
+        this.featureBags.add(featureBag);
     }
+
+//    public void setFeatureBags(List<FeatureBag> featureBags) {
+//        this.featureBags = featureBags;
+//    }
 
     public Product() {}
 
@@ -85,8 +89,8 @@ public class Product {
         this.categoryLogic = categoryLogic;
     }
 
-    public List<Feature> getFeatures() {
-        return features;
+    public List<FeatureBag> getFeatureBags() {
+        return featureBags;
     }
 
     @Override

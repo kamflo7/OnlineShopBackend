@@ -13,10 +13,6 @@ public class FeatureValue {
 
     private String value;
 
-//    @ManyToMany(cascade = CascadeType.ALL)
-//    private List<Feature> features = new ArrayList<>(); // todo: remove this or something; It was NOT planned
-    // but I did this, because I thought it is impossible to do ManyToMany relationship without bidirectional
-
     public FeatureValue() {}
 
     public FeatureValue(String value) {

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Feature {
+public class FeatureBag {
 
     @Id
     @GeneratedValue
@@ -15,9 +15,6 @@ public class Feature {
     @JoinColumn(name = "feature_definition_id")
     private FeatureDefinition featureDefinition;
 
-//    @ManyToMany(mappedBy = "features", cascade = CascadeType.ALL)
-//    private List<FeatureValue> featureValues = new ArrayList<>();
-
     @ManyToMany(cascade = CascadeType.ALL)
     private List<FeatureValue> featureValues = new ArrayList<>();
 
@@ -25,15 +22,19 @@ public class Feature {
         return featureDefinition;
     }
 
-    public Feature() {}
+    public FeatureBag() {}
 
-    public Feature(FeatureDefinition featureDefinition, FeatureValue featureValue) {
+    public FeatureBag(FeatureDefinition featureDefinition) {
+        this.featureDefinition = featureDefinition;
+    }
+
+    public FeatureBag(FeatureDefinition featureDefinition, FeatureValue featureValue) {
         this.featureDefinition = featureDefinition;
         featureValues = new ArrayList<>(1);
         featureValues.add(featureValue);
     }
 
-    public Feature(FeatureDefinition featureDefinition, List<FeatureValue> featureValues) {
+    public FeatureBag(FeatureDefinition featureDefinition, List<FeatureValue> featureValues) {
         this.featureDefinition = featureDefinition;
         this.featureValues = featureValues;
     }

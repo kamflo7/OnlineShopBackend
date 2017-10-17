@@ -1,4 +1,4 @@
-package pl.kflorczyk.onlineshopbackend.repository;
+package pl.kflorczyk.onlineshopbackend.repositoriesAndServices;
 
 import org.assertj.core.util.Lists;
 import org.junit.Test;
@@ -11,11 +11,12 @@ import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.filter;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -48,11 +49,11 @@ public class ProductRepositoryTests {
 
         for(int i=0; i<phoneNames.length; i++) {
             Product p = new Product(phoneNames[i], new BigDecimal(prices[i]), 100, "Some description index " + i, categoryLogicSmartphones);
-            p.addFeature(new Feature(featureDefRAM, ram[i]));
-            p.addFeature(new Feature(featureDefScreenInches, inches[i]));
-            p.addFeature(new Feature(featureDefScreenInchesRange, inchesR[i]));
-            p.addFeature(new Feature(featureDefResolution, res[i]));
-            p.addFeature(new Feature(featureDefConnection, cn.get(i)));
+            p.addFeature(new FeatureBag(featureDefRAM, ram[i]));
+            p.addFeature(new FeatureBag(featureDefScreenInches, inches[i]));
+            p.addFeature(new FeatureBag(featureDefScreenInchesRange, inchesR[i]));
+            p.addFeature(new FeatureBag(featureDefResolution, res[i]));
+            p.addFeature(new FeatureBag(featureDefConnection, cn.get(i)));
             productRepository.save(p);
         }
         productRepository.flush();
@@ -88,6 +89,7 @@ public class ProductRepositoryTests {
         featureDefInternalStorage.setFeatureValueDefinitions(Lists.newArrayList(storage8GB, storage16GB, storage32GB));
         featureDefScreenInches.setFeatureValueDefinitions(Lists.newArrayList(screen47, screen5, screen63));
         featureDefScreenInchesRange.setFeatureValueDefinitions(Lists.newArrayList(screenRange48_54, screenRange55_6, screen63));
+        featureDefConnection.setFeatureValueDefinitions(Lists.newArrayList(connWifi, connNfc, connBt42));
 
         categoryLogicSmartphones.addFeatureGroup(featureGroupTechInfo);
         categoryLogicSmartphones.addFeatureDefinition(featureDefCpu);
@@ -102,11 +104,11 @@ public class ProductRepositoryTests {
     }
 
     @Test
-    public void relationTestAndFiltering() {
+    public void shouldReturnFilteredProducts() {
         setupDatabaseStructure();
         setupDatabaseContent();
 
-        productService = new ProductService(productRepository);
+        productService = new ProductService(productRepository, categoryLogicRepository);
 
         // pure filter params in URL
         String urlParams = String.format("%d=%d,%d=%d.%d.%d",
@@ -117,19 +119,42 @@ public class ProductRepositoryTests {
         List<Product> all = productService.getProducts(categoryLogicSmartphones, filterParameters);
 
         assertThat(all.size()).isEqualTo(1);
-        assertThat(all.get(0).getFeatures().size()).isEqualTo(5);
-
-        System.out.print("breakpoint");
+        assertThat(all.get(0).getFeatureBags().size()).isEqualTo(5);
     }
 
     @Test
-    public void anotherTest() {
+    public void shouldReturnAllProductsInCategory() {
         setupDatabaseStructure();
         setupDatabaseContent();
 
         CategoryLogic c = CategoryLogic.ofID(categoryLogicSmartphones.getID());
         List<Product> byCategoryLogic = productRepository.findByCategoryLogic(c);
+        assertThat(byCategoryLogic.size()).isGreaterThan(0);
+    }
 
-        System.out.println("breakpoint");
+    @Test
+    public void shouldCreateProduct() {
+        setupDatabaseStructure();
+        productService = new ProductService(productRepository, categoryLogicRepository);
+
+        Map<Long, List<Long>> features = new HashMap<>();
+        features.put(featureDefRAM.getId(), Lists.newArrayList(ram4GB.getID()));
+        features.put(featureDefInternalStorage.getId(), Lists.newArrayList(storage32GB.getID()));
+        features.put(featureDefScreenInches.getId(), Lists.newArrayList(screen63.getID()));
+        features.put(featureDefConnection.getId(), Lists.newArrayList(connWifi.getID(), connBt42.getID(), connNfc.getID()));
+
+        try {
+            productService.createProduct(categoryLogicSmartphones.getID(),
+                    "Huawei Mate 4", "Najnowszy telefon z premiera w pazdzierniku 2017 (chyba)",
+                    new BigDecimal("1980.0"), 15, features);
+        } catch(RuntimeException e) {
+            fail("Should not throw runtimeexception: " + e.getMessage());
+        }
+
+        Product obtained = productService.getProducts(categoryLogicSmartphones).get(0);
+
+        assertThat(obtained.getName()).isEqualTo("Huawei Mate 4");
+        assertThat(obtained.getCategoryLogic().getID()).isEqualTo(categoryLogicSmartphones.getID());
+        assertThat(obtained.getFeatureBags().size()).isEqualTo(4);
     }
 }
