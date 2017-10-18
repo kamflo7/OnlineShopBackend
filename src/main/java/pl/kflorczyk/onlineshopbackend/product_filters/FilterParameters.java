@@ -6,6 +6,8 @@ import pl.kflorczyk.onlineshopbackend.model.FeatureValue;
 import java.util.*;
 
 public class FilterParameters {
+    public static final String FILTER_PRICE = "prc";
+
     private Map<FeatureDefinition, List<FeatureValue>> map = new HashMap<>();
 
     public FilterParameters() {}
@@ -43,6 +45,6 @@ public class FilterParameters {
     }
 
     public int size() {
-        return map.size();
+        return map == null ? 0 : map.size();
     }
 }

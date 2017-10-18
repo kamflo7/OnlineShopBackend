@@ -22,7 +22,7 @@ import static org.assertj.core.api.Java6Assertions.fail;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class CategoriesTests {
+public class CategoryControllerTests {
 
     @Autowired
     private CategoryLogicRepository categoryLogicRepository;

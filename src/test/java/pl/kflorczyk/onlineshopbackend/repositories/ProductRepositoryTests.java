@@ -11,6 +11,7 @@ import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,9 +112,11 @@ public class ProductRepositoryTests {
         productService = new ProductService(productRepository, categoryLogicRepository);
 
         // pure filter params in URL
-        String urlParams = String.format("%d=%d,%d=%d.%d.%d",
+        String urlParams = String.format("%d=%d,%d=%d.%d.%d,prc=100.0-5000.0",
                 featureDefRAM.getId(), ram6GB.getID(),
                 featureDefConnection.getId(), connWifi.getID(), connBt42.getID(), connNfc.getID());
+
+//        urlParams = "";
 
         FilterParameters filterParameters = new FilterParameters(urlParams);
         List<Product> all = productService.getProducts(categoryLogicSmartphones, filterParameters);

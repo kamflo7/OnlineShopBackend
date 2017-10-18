@@ -60,9 +60,22 @@ public class ProductService {
         return result;
     }
 
-    private boolean isProductSuitable(Product product, Map<FeatureDefinition, List<FeatureValue>> map) {
+    private boolean isProductSuitable(Product product, Map<FeatureDefinition, List<FeatureValue>> givenFilters) {
+        if(givenFilters == null)
+            return true;
+
         for(FeatureBag featureBag : product.getFeatureBags()) {
-            for(Map.Entry<FeatureDefinition, List<FeatureValue>> entry : map.entrySet()) {
+            for(Map.Entry<FeatureDefinition, List<FeatureValue>> entry : givenFilters.entrySet()) {
+                if(entry.getKey().isDummyPriceFilter()) { // todo: dummy solution, don't have enough time, fix later
+                    BigDecimal min = new BigDecimal(entry.getValue().get(0).getValue());
+                    BigDecimal max = new BigDecimal(entry.getValue().get(1).getValue());
+
+                    if(product.getPrice().compareTo(min) == -1 || product.getPrice().compareTo(max) == 1)
+                        return false;
+
+                    continue;
+                }
+
                 if(entry.getKey().getId() == featureBag.getFeatureDefinition().getId()) {
                     if(featureBag.getFeatureDefinition().isMultipleValues()) {
                         // Product has FeatureDef("Wireless connectivity") and its List<FeatureValue> has MANY elements

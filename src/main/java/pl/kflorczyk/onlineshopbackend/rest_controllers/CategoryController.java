@@ -6,16 +6,23 @@ import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
 import pl.kflorczyk.onlineshopbackend.model.FeatureGroup;
+import pl.kflorczyk.onlineshopbackend.model.Product;
+import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.Response;
 import pl.kflorczyk.onlineshopbackend.services.CategoryService;
+import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
-public class Categories {
+public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private ProductService productService;
 
     @GetMapping(path = "/categories/{id}")
     public CategoryLogic getCategory(@PathVariable long id) {
@@ -23,23 +30,8 @@ public class Categories {
         return categoryLogic;
     }
 
-//    @PutMapping(path = "/categories")
-//    public CategoryResponse createCategory(@RequestParam(name = "name") String name, HttpServletRequest request) {
-//        CategoryLogic categoryLogic = null;
-//
-//        try {
-//            categoryLogic = categoryService.createNewCategory(name);
-//        } catch(InvalidCategoryNameException e) {
-//            return new CategoryResponse(AbstractResponse.STATUS_FAILURE, e.getMessage());
-//        } catch(CategoryAlreadyExistsException e) {
-//            return new CategoryResponse(AbstractResponse.STATUS_FAILURE, e.getMessage());
-//        }
-//
-//        return new CategoryResponse(CategoryResponse.STATUS_SUCCESS, categoryLogic);
-//    }
-
     @PutMapping(path = "/categories")
-    public Response<CategoryLogic> createCategory(@RequestParam(name = "name") String name, HttpServletRequest request) {
+    public Response<CategoryLogic> createCategory(@RequestParam(name = "name") String name) {
         CategoryLogic categoryLogic = null;
 
         try {
@@ -82,5 +74,15 @@ public class Categories {
         }
 
         return new Response<>(categoryLogic);
+    }
+
+    @GetMapping(path = "/categories/{categoryID}/products")
+    public Response<List<Product>> getProducts(
+            @PathVariable(name = "categoryID") long categoryID,
+            @RequestParam(name = "f") String filters
+    ) {
+        FilterParameters filterParameters = new FilterParameters(filters);
+        List<Product> products = productService.getProducts(categoryID, filterParameters);
+        return new Response<>(products);
     }
 }

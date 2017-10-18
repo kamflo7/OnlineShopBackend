@@ -34,6 +34,11 @@ public class FeatureDefinition {
 
     private boolean visible;
 
+    // not the best ofc, but don't have enough time to redesign FilterParameters logic, so this is temporary solution
+    // todo: dummy solution, don't have enough time, fix later
+    @Transient
+    private boolean dummyPriceFilter;
+
     public FeatureDefinition() {}
 
     public FeatureDefinition(String name, FeatureGroup featureGroup) {
@@ -54,6 +59,16 @@ public class FeatureDefinition {
         this.filterable = filterable;
         this.multipleValues = multipleValues;
         this.visible = visible;
+    }
+
+    public static FeatureDefinition forPriceFilter() {
+        FeatureDefinition fd = new FeatureDefinition();
+        fd.dummyPriceFilter = true;
+        return fd;
+    }
+
+    public boolean isDummyPriceFilter() {
+        return dummyPriceFilter;
     }
 
     public static FeatureDefinition ofID(long id) {
