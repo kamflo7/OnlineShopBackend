@@ -1,5 +1,6 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@JsonFilter("getProductsFilter_product")
 public class Product {
 
     @Id
@@ -24,7 +26,7 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_logic_id")
-    @JsonIgnore
+//    @JsonIgnore
     private CategoryLogic categoryLogic;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

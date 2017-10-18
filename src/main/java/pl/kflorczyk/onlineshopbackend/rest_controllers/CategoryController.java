@@ -1,5 +1,10 @@
 package pl.kflorczyk.onlineshopbackend.rest_controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
@@ -39,7 +44,7 @@ public class CategoryController {
         try {
             categoryLogic = categoryService.createNewCategory(name);
         } catch(InvalidCategoryNameException | CategoryAlreadyExistsException e) {
-            return new Response<>(Response.STATUS_FAILURE, e.getMessage());
+            return new Response<>(Response.Status.FAILURE, e.getMessage());
         }
 
         return new Response<>(categoryLogic);
@@ -55,7 +60,7 @@ public class CategoryController {
         try {
             categoryLogic = categoryService.createFeatureGroup(name, categoryID);
         } catch(CategoryNotFoundException | InvalidFeatureGroupNameException e) {
-            return new Response<>(Response.STATUS_FAILURE, e.getMessage());
+            return new Response<>(Response.Status.FAILURE, e.getMessage());
         }
 
         return new Response<>(categoryLogic);
@@ -72,27 +77,38 @@ public class CategoryController {
         try {
             categoryLogic = categoryService.createFeatureDefinition(featureDTO, groupID, categoryID);
         } catch(CategoryNotFoundException | FeatureGroupNotFoundException | InvalidFeatureGroupNameException | InvalidFeatureValueDefinitionException e) {
-            return new Response<>(Response.STATUS_FAILURE, e.getMessage());
+            return new Response<>(Response.Status.FAILURE, e.getMessage());
         }
 
         return new Response<>(categoryLogic);
     }
 
     @GetMapping(path = "/categories/{categoryID}/products")
-    public Response<List<Product>> getProducts(
+    public String getProducts(
             @PathVariable(name = "categoryID") long categoryID,
-            @RequestParam(name = "f") String filters
+            @RequestParam(name = "f", required = false) String filters
     ) {
         FilterParameters filterParameters = new FilterParameters(filters);
         List<Product> products = productService.getProducts(categoryID, filterParameters);
-        return new Response<>(products);
+
+        String result = null;
+        try {
+             result = new ObjectMapper()
+                    .writer(getFiltersForProducts())
+                    .writeValueAsString(new Response<>(products));
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+
+        return result;
     }
 
     @PutMapping(path = "/categories/{categoryID}/products")
-    public Response<Product> createProduct(
+    public String createProduct(
         @PathVariable(name = "categoryID") long categoryID,
         @RequestBody ProductDTO productDTO
-    ) {
+    ) { // not the shortest method because returned type has been changed from ResponseType<T> to String
+        // in case of sudden neccessary use @JsonFilters
         Product product = null;
 
         try {
@@ -102,9 +118,31 @@ public class CategoryController {
                 CategoryNotFoundException |
                 InvalidProductNameException |
                 InvalidProductDescriptionException e) {
-            return new Response<>(Response.STATUS_FAILURE, e.getMessage());
+            try {
+                return new ObjectMapper().writeValueAsString(new Response<>(Response.Status.FAILURE, e.getMessage()));
+            } catch (JsonProcessingException e1) {
+                return null;
+            }
         }
 
-        return new Response<>(product);
+        String result = null;
+        try {
+            result = new ObjectMapper()
+                    .writer(getFiltersForProducts())
+                    .writeValueAsString(new Response<>(product));
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+
+        return result;
+    }
+
+    private FilterProvider getFiltersForProducts() {
+        return new SimpleFilterProvider()
+                .addFilter("getProductsFilter_product",
+                        SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
+                .addFilter("getProductsFilter_featureDefinition",
+                        SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic", "featureGroup", "featureValueDefinitions",
+                                "visible", "filterable", "multipleValues", "name"));
     }
 }

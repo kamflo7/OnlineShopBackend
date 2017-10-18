@@ -1,6 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@JsonFilter("getProductsFilter_featureDefinition")
 public class FeatureDefinition {
 
     @Id
