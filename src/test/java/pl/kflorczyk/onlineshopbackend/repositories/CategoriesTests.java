@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.InvalidFeatureValueDefinitionException;
 import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
 import pl.kflorczyk.onlineshopbackend.model.FeatureDefinition;
@@ -63,10 +64,10 @@ public class CategoriesTests {
         categoryService.createFeatureGroup("Informacje techniczne", smartfony);
         FeatureGroup informacje_techniczne = smartfony.getFeatureGroups().stream().filter(g -> g.getName().equals("Informacje techniczne")).findAny().get();
 
-        List<FeatureValue> values = Lists.newArrayList(new FeatureValue("512MB"), new FeatureValue("1GB"), new FeatureValue("2GB"), new FeatureValue("3GB"), new FeatureValue("4GB"));
-
+        FeatureDefinitionDTO featureDefinitionDTO = new FeatureDefinitionDTO(false, true, true, "Pamięć RAM",
+                Lists.newArrayList("512MB", "1GB", "2GB", "3GB", "4GB"));
         try {
-            categoryService.createFeatureDefinition("Pamięć RAM", false, true, true, values, informacje_techniczne, smartfony);
+            categoryService.createFeatureDefinition(featureDefinitionDTO, informacje_techniczne, smartfony);
         } catch (InvalidFeatureValueDefinitionException e) {
             fail("createFeatureDefinition method should not throw exception");
         }
@@ -75,7 +76,7 @@ public class CategoriesTests {
         CategoryLogic smartfonyObtained = categoryService.getCategoryLogic("Smartfony");
         List<FeatureDefinition> featureDefinitionsObtained = smartfonyObtained.getFeatureDefinitions();
 
-        assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().size()).isEqualTo(values.size());
-        assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().get(0).getValue()).isEqualTo(values.get(0).getValue());
+        assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().size()).isEqualTo(featureDefinitionDTO.getValues().size());
+        assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().get(0).getValue()).isEqualTo(featureDefinitionDTO.getValues().get(0));
     }
 }
