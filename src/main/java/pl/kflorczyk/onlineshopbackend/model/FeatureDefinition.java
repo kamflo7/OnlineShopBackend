@@ -1,6 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class FeatureDefinition {
     // not the best ofc, but don't have enough time to redesign FilterParameters logic, so this is temporary solution
     // todo: dummy solution, don't have enough time, fix later
     @Transient
+    @JsonIgnore
     private boolean dummyPriceFilter;
 
     public FeatureDefinition() {}

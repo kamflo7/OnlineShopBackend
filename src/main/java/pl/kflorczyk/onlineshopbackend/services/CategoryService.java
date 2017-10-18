@@ -3,6 +3,7 @@ package pl.kflorczyk.onlineshopbackend.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
+import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
@@ -118,4 +119,7 @@ public class CategoryService {
         return createFeatureDefinition(featureDefinitionDTO, featureGroup.get(), categoryLogic);
     }
 
+    public void createProduct(long categoryID, ProductDTO productDTO) {
+
+    }
 }

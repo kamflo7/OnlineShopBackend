@@ -3,6 +3,7 @@ package pl.kflorczyk.onlineshopbackend.rest_controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
+import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
 import pl.kflorczyk.onlineshopbackend.model.FeatureGroup;
@@ -13,7 +14,8 @@ import pl.kflorczyk.onlineshopbackend.services.CategoryService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 @RestController
 public class CategoryController {
@@ -25,9 +27,9 @@ public class CategoryController {
     private ProductService productService;
 
     @GetMapping(path = "/categories/{id}")
-    public CategoryLogic getCategory(@PathVariable long id) {
+    public Response<CategoryLogic> getCategory(@PathVariable long id) {
         CategoryLogic categoryLogic = categoryService.getCategoryLogic(id);
-        return categoryLogic;
+        return new Response<>(categoryLogic);
     }
 
     @PutMapping(path = "/categories")
@@ -84,5 +86,25 @@ public class CategoryController {
         FilterParameters filterParameters = new FilterParameters(filters);
         List<Product> products = productService.getProducts(categoryID, filterParameters);
         return new Response<>(products);
+    }
+
+    @PutMapping(path = "/categories/{categoryID}/products")
+    public Response<Product> createProduct(
+        @PathVariable(name = "categoryID") long categoryID,
+        @RequestBody ProductDTO productDTO
+    ) {
+        Product product = null;
+
+        try {
+            product = productService.createProduct(categoryID, productDTO);
+        } catch(IncompatibleFeatureValueDefinitionAssignmentException |
+                IncompatibleFeatureDefinitionAssignmentException |
+                CategoryNotFoundException |
+                InvalidProductNameException |
+                InvalidProductDescriptionException e) {
+            return new Response<>(Response.STATUS_FAILURE, e.getMessage());
+        }
+
+        return new Response<>(product);
     }
 }

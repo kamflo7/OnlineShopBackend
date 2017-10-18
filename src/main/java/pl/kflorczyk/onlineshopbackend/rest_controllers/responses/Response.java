@@ -5,7 +5,7 @@ public class Response<T> {
     public static final String STATUS_FAILURE = "failure";
 
     private String status, description;
-    private T data;
+    private T data = null;
 
     public Response(String status) {
         this.status = status;

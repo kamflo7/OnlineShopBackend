@@ -1,5 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_logic_id")
+    @JsonIgnore
     private CategoryLogic categoryLogic;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

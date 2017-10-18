@@ -3,6 +3,7 @@ package pl.kflorczyk.onlineshopbackend.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureBagDTO;
+import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
@@ -119,12 +120,11 @@ public class ProductService {
         }
 
         Product product = new Product(name, price, amount, description, categoryLogic);
-        productRepository.saveAndFlush(product);
-
         for(FeatureBagDTO featureBagDTO : features) {
             FeatureBag featureBag = new FeatureBag(featureBagDTO.getFeatureDefinition(), featureBagDTO.getFeatureValues());
             product.addFeature(featureBag);
         }
+        productRepository.saveAndFlush(product);
 
         return product;
     }
@@ -181,5 +181,7 @@ public class ProductService {
         return createProduct(categoryLogic, name, description, price, amount, outputTranslatedFeatures);
     }
 
-
+    public Product createProduct(long categoryLogicID, ProductDTO productDTO) {
+        return createProduct(categoryLogicID, productDTO.getName(), productDTO.getDescription(), productDTO.getPrice(), productDTO.getAmount(), productDTO.getFeatures());
+    }
 }
