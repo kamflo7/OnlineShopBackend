@@ -1,7 +1,6 @@
-package pl.kflorczyk.onlineshopbackend.repositoriesAndServices;
+package pl.kflorczyk.onlineshopbackend.repositories;
 
 import org.assertj.core.util.Lists;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,12 +14,10 @@ import pl.kflorczyk.onlineshopbackend.model.FeatureGroup;
 import pl.kflorczyk.onlineshopbackend.model.FeatureValue;
 import pl.kflorczyk.onlineshopbackend.services.CategoryService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.fail;
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -63,18 +60,19 @@ public class CategoriesTests {
     @Test
     public void shouldCreateFeatureDefinitionsAndTheirPotentialValuesForCategory() {
         CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
-        FeatureGroup informacje_techniczne = categoryService.createFeatureGroup("Informacje techniczne", smartfony);
+        categoryService.createFeatureGroup("Informacje techniczne", smartfony);
+        FeatureGroup informacje_techniczne = smartfony.getFeatureGroups().stream().filter(g -> g.getName().equals("Informacje techniczne")).findAny().get();
 
         List<FeatureValue> values = Lists.newArrayList(new FeatureValue("512MB"), new FeatureValue("1GB"), new FeatureValue("2GB"), new FeatureValue("3GB"), new FeatureValue("4GB"));
 
         try {
-            FeatureDefinition ram = categoryService.createFeatureDefinition("Pamięć RAM", false, true, true, values, informacje_techniczne, smartfony);
+            categoryService.createFeatureDefinition("Pamięć RAM", false, true, true, values, informacje_techniczne, smartfony);
         } catch (InvalidFeatureValueDefinitionException e) {
             fail("createFeatureDefinition method should not throw exception");
         }
 
         //
-        CategoryLogic smartfonyObtained = categoryService.findCategoryLogic("Smartfony");
+        CategoryLogic smartfonyObtained = categoryService.getCategoryLogic("Smartfony");
         List<FeatureDefinition> featureDefinitionsObtained = smartfonyObtained.getFeatureDefinitions();
 
         assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().size()).isEqualTo(values.size());

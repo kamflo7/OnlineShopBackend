@@ -1,5 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,6 +15,7 @@ public class FeatureGroup {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_logic_id")
+    @JsonBackReference
     private CategoryLogic categoryLogic;
 
     public FeatureGroup() { }
@@ -35,5 +38,14 @@ public class FeatureGroup {
 
     public void setCategoryLogic(CategoryLogic categoryLogic) {
         this.categoryLogic = categoryLogic;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%d:%s", id, name);
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

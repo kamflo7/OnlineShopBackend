@@ -6,8 +6,8 @@ import pl.kflorczyk.onlineshopbackend.dto.FeatureBagDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
-import pl.kflorczyk.onlineshopbackend.repositoriesAndServices.CategoryLogicRepository;
-import pl.kflorczyk.onlineshopbackend.repositoriesAndServices.ProductRepository;
+import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
+import pl.kflorczyk.onlineshopbackend.repositories.ProductRepository;
 import pl.kflorczyk.onlineshopbackend.validators.ProductValidator;
 
 import java.math.BigDecimal;
@@ -26,11 +26,21 @@ public class ProductService {
         this.categoryLogicRepository = categoryLogicRepository;
     }
 
+    public List<Product> getProducts(long categoryID) {
+        return getProducts(categoryID, null);
+    }
+
+    public List<Product> getProducts(long categoryID, FilterParameters parameters) {
+        return getProducts(categoryLogicRepository.findOne(categoryID), parameters);
+    }
+
     public List<Product> getProducts(CategoryLogic categoryLogic) {
         return getProducts(categoryLogic, null);
     }
 
     public List<Product> getProducts(CategoryLogic categoryLogic, FilterParameters parameters) {
+        if(categoryLogic == null) return null;
+
         List<Product> received = productRepository.findByCategoryLogic(categoryLogic);
         List<Product> result;
 
@@ -98,14 +108,11 @@ public class ProductService {
         Product product = new Product(name, price, amount, description, categoryLogic);
         productRepository.saveAndFlush(product);
 
-//        List<FeatureBag> featureBags = new ArrayList<>(features.size());
         for(FeatureBagDTO featureBagDTO : features) {
             FeatureBag featureBag = new FeatureBag(featureBagDTO.getFeatureDefinition(), featureBagDTO.getFeatureValues());
-//            featureBags.add(featureBag);
             product.addFeature(featureBag);
         }
 
-//        product.setFeatureBags(featureBags);
         return product;
     }
 

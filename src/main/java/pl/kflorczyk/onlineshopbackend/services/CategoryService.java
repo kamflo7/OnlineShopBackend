@@ -2,15 +2,19 @@ package pl.kflorczyk.onlineshopbackend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
-import pl.kflorczyk.onlineshopbackend.repositoriesAndServices.CategoryLogicRepository;
-import pl.kflorczyk.onlineshopbackend.repositoriesAndServices.CategoryViewRepository;
+import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
+import pl.kflorczyk.onlineshopbackend.repositories.CategoryViewRepository;
 import pl.kflorczyk.onlineshopbackend.validators.CategoryValidator;
 import pl.kflorczyk.onlineshopbackend.validators.FeatureDefinitionValidator;
 import pl.kflorczyk.onlineshopbackend.validators.FeatureGroupValidator;
 import pl.kflorczyk.onlineshopbackend.validators.SimpleNameValidator;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,8 +35,12 @@ public class CategoryService {
 
     public List<CategoryLogic> getCategoriesLogic() { return categoryLogicRepository.findAll(); }
 
-    public CategoryLogic findCategoryLogic(String name) {
+    public CategoryLogic getCategoryLogic(String name) {
         return categoryLogicRepository.findByNameIgnoreCase(name);
+    }
+
+    public CategoryLogic getCategoryLogic(long ID) {
+        return categoryLogicRepository.findOne(ID);
     }
 
     public CategoryLogic createNewCategory(String categoryName) {
@@ -42,7 +50,7 @@ public class CategoryService {
 
         CategoryLogic byName = categoryLogicRepository.findByNameIgnoreCase(categoryName);
         if(byName != null) {
-            return null;
+            throw new CategoryAlreadyExistsException("The name for category is already taken");
         }
 
         CategoryLogic categoryLogic = new CategoryLogic(categoryName);
@@ -50,17 +58,18 @@ public class CategoryService {
         return categoryLogic;
     }
 
-    public FeatureGroup createFeatureGroup(String name, CategoryLogic categoryLogic) {
+    public CategoryLogic createFeatureGroup(String name, CategoryLogic categoryLogic) {
         if(!new FeatureGroupValidator().validate(name)) {
             throw new InvalidFeatureGroupNameException("Invalid name");
         }
 
         FeatureGroup featureGroup = new FeatureGroup(name);
         categoryLogic.addFeatureGroup(featureGroup);
-        return featureGroup;
+        categoryLogicRepository.saveAndFlush(categoryLogic);
+        return categoryLogic;
     }
 
-    public FeatureGroup createFeatureGroup(String name, long categoryID) {
+    public CategoryLogic createFeatureGroup(String name, long categoryID) {
         CategoryLogic categoryLogic = categoryLogicRepository.findOne(categoryID);
 
         if(categoryLogic == null) {
@@ -70,25 +79,30 @@ public class CategoryService {
         return createFeatureGroup(name, categoryLogic);
     }
 
-    public FeatureDefinition createFeatureDefinition(String name, boolean multipleValues, boolean filterable, boolean visible, List<FeatureValue> values, FeatureGroup featureGroup, CategoryLogic categoryLogic) {
-        if(!new FeatureDefinitionValidator().validate(name)) {
+    public CategoryLogic createFeatureDefinition(FeatureDefinitionDTO featureDefinitionDTO, FeatureGroup featureGroup, CategoryLogic categoryLogic) {
+        if(!new FeatureDefinitionValidator().validate(featureDefinitionDTO.getName())) {
             throw new InvalidFeatureGroupNameException("Invalid name");
         }
 
         SimpleNameValidator validator = new SimpleNameValidator(3);
-        values.stream().forEach( f -> {
-            if(!validator.validate(f.getValue())) {
+        featureDefinitionDTO.getValues().stream().forEach( f -> {
+            if(!validator.validate(f)) {
                 throw new InvalidFeatureValueDefinitionException("Invalid value for FeatureValue");
             }
         });
 
-        FeatureDefinition featureDefinition = new FeatureDefinition(name, featureGroup, filterable, multipleValues, visible);
+        FeatureDefinition featureDefinition = new FeatureDefinition(featureDefinitionDTO.getName(), featureGroup, featureDefinitionDTO.isFilterable(), featureDefinitionDTO.isMultipleValues(), featureDefinitionDTO.isVisible());
         categoryLogic.addFeatureDefinition(featureDefinition);
-        featureDefinition.setFeatureValueDefinitions(values);
-        return featureDefinition;
+
+        List<FeatureValue> featureValues = new ArrayList<>(featureDefinitionDTO.getValues().size());
+        featureDefinitionDTO.getValues().stream().forEach(f -> featureValues.add(new FeatureValue(f)));
+
+        featureDefinition.setFeatureValueDefinitions(featureValues);
+        categoryLogicRepository.saveAndFlush(categoryLogic);
+        return categoryLogic;
     }
 
-    public FeatureDefinition createFeatureDefinition(String name, boolean multipleValues, boolean filterable, boolean visible, List<FeatureValue> values, long featureGroupID, long categoryID) {
+    public CategoryLogic createFeatureDefinition(FeatureDefinitionDTO featureDefinitionDTO, long featureGroupID, long categoryID) {
         CategoryLogic categoryLogic = categoryLogicRepository.findOne(categoryID);
 
         if(categoryLogic == null) {
@@ -101,8 +115,7 @@ public class CategoryService {
             throw new FeatureGroupNotFoundException("FeatureGroup not found for given ID");
         }
 
-        return createFeatureDefinition(name, multipleValues, filterable, visible, values, featureGroup.get(), categoryLogic);
+        return createFeatureDefinition(featureDefinitionDTO, featureGroup.get(), categoryLogic);
     }
-
 
 }

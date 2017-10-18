@@ -1,4 +1,4 @@
-package pl.kflorczyk.onlineshopbackend.repositoriesAndServices;
+package pl.kflorczyk.onlineshopbackend.repositories;
 
 import org.assertj.core.util.Lists;
 import org.junit.Test;

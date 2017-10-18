@@ -1,5 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,15 +10,17 @@ import java.util.List;
 public class CategoryLogic {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue
     private long ID;
 
     private String name;
 
     @OneToMany(mappedBy = "categoryLogic", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<FeatureDefinition> featureDefinitions = new ArrayList<>();
 
     @OneToMany(mappedBy = "categoryLogic", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<FeatureGroup> featureGroups = new ArrayList<>();
 
     public void addFeatureGroup(FeatureGroup featureGroup) {
@@ -64,4 +68,6 @@ public class CategoryLogic {
     public List<FeatureGroup> getFeatureGroups() {
         return featureGroups;
     }
+
+
 }

@@ -45,6 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/test").permitAll() // todo:remove
                 .antMatchers("/categories").permitAll()
+                .antMatchers("/categories/**").permitAll()
                 .antMatchers("/products").permitAll()
                 .antMatchers("/authenticatedTestResource").hasAuthority("ROLE_USER")
 //                .antMatchers("/user/*", "/user", "/userlist").permitAll()
@@ -61,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT"));
         configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "X-Auth-Token", "Authorization"));
         configuration.setExposedHeaders(Arrays.asList("Origin", "Accept", "Content-Type", "Location", "Token"));
         //configuration.setAllowCredentials(true);

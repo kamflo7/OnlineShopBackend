@@ -1,4 +1,4 @@
-package pl.kflorczyk.onlineshopbackend.repositoriesAndServices;
+package pl.kflorczyk.onlineshopbackend.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import pl.kflorczyk.onlineshopbackend.model.User;

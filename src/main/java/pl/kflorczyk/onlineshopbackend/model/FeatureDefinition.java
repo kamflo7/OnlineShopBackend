@@ -1,5 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ public class FeatureDefinition {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_logic_id")
+    @JsonBackReference
     private CategoryLogic categoryLogic;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -106,5 +109,9 @@ public class FeatureDefinition {
     @Override
     public String toString() {
         return String.format("%d:%s", id, name);
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 }

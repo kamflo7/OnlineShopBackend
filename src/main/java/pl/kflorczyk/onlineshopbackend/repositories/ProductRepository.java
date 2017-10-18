@@ -1,4 +1,4 @@
-package pl.kflorczyk.onlineshopbackend.repositoriesAndServices;
+package pl.kflorczyk.onlineshopbackend.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
@@ -20,5 +20,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 //
 //    @Query(value = "SELECT id, name FROM category_logic WHERE name = (:name) LIMIT 1", nativeQuery = true)
 //    @Transactional
-//    CategoryLogic findCategoryLogic(@Param("name") String name);
+//    CategoryLogic getCategoryLogic(@Param("name") String name);
 }
