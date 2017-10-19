@@ -171,7 +171,8 @@ public class ProductService {
                 }
 
                 if(!foundValue) {
-                    throw new IncompatibleFeatureValueDefinitionAssignmentException("Given FeatureValue not found for given CategoryLogic->FeatureDefinition");
+                    throw new IncompatibleFeatureValueDefinitionAssignmentException(
+                            String.format("Given FeatureValue[%d] not found for given CategoryLogic->FeatureDefinition [%d]", givenFeatureValue, featureDefinition.getId()));
                 }
             }
 

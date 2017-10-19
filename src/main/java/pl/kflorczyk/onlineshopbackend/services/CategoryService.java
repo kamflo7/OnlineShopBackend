@@ -3,6 +3,7 @@ package pl.kflorczyk.onlineshopbackend.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
+import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTOEditable;
 import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
@@ -17,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -82,7 +84,7 @@ public class CategoryService {
 
     public CategoryLogic createFeatureDefinition(FeatureDefinitionDTO featureDefinitionDTO, FeatureGroup featureGroup, CategoryLogic categoryLogic) {
         if(!new FeatureDefinitionValidator().validate(featureDefinitionDTO.getName())) {
-            throw new InvalidFeatureGroupNameException("Invalid name");
+            throw new InvalidFeatureDefinitionNameException("Invalid name");
         }
 
         SimpleNameValidator validator = new SimpleNameValidator(3);
@@ -97,6 +99,8 @@ public class CategoryService {
 
         List<FeatureValue> featureValues = new ArrayList<>(featureDefinitionDTO.getValues().size());
         featureDefinitionDTO.getValues().stream().forEach(f -> featureValues.add(new FeatureValue(f)));
+//        featureDefinitionDTO.getValues().forEach(f -> featureValues.add(new FeatureValue(f)));
+        // todo: deal with this above
 
         featureDefinition.setFeatureValueDefinitions(featureValues);
         categoryLogicRepository.saveAndFlush(categoryLogic);
@@ -119,7 +123,91 @@ public class CategoryService {
         return createFeatureDefinition(featureDefinitionDTO, featureGroup.get(), categoryLogic);
     }
 
-    public void createProduct(long categoryID, ProductDTO productDTO) {
+    public void editCategoryLogic(long ID, String newName) {
+        if(!new CategoryValidator().validate(newName)) {
+            throw new InvalidCategoryNameException("Invalid name");
+        }
 
+        CategoryLogic categoryLogic = categoryLogicRepository.findOne(ID);
+        if(categoryLogic == null) {
+            throw new CategoryNotFoundException("The name for category is already taken");
+        }
+
+        categoryLogic.setName(newName);
+        categoryLogicRepository.saveAndFlush(categoryLogic);
+    }
+
+    public void editFeatureGroup(long categoryID, long featureGroupID, String newName) {
+        if(!new FeatureGroupValidator().validate(newName)) {
+            throw new InvalidFeatureGroupNameException("Invalid name");
+        }
+
+        CategoryLogic categoryLogic = categoryLogicRepository.findOne(categoryID);
+        if(categoryLogic == null) {
+            throw new CategoryNotFoundException("The name for category is already taken");
+        }
+
+        Optional<FeatureGroup> featureGroup = categoryLogic.getFeatureGroups().stream().filter(f -> f.getId() == featureGroupID).findAny();
+        if(!featureGroup.isPresent()) {
+            throw new FeatureGroupNotFoundException("FeatureGroup not found for given id");
+        }
+
+        featureGroup.get().setName(newName);
+        categoryLogicRepository.saveAndFlush(categoryLogic);
+    }
+
+    public CategoryLogic editFeatureDefinition(long categoryID, long featureGroupID, long featureDefinitionID, FeatureDefinitionDTOEditable newFeatureDefinition) {
+        if(!new FeatureDefinitionValidator().validate(newFeatureDefinition.getName())) {
+            throw new InvalidFeatureDefinitionNameException("Invalid name");
+        }
+
+        Map<Long, String> givenNewValues = newFeatureDefinition.getValues();
+
+        SimpleNameValidator validator = new SimpleNameValidator(3);
+        if(givenNewValues != null) {
+            givenNewValues.forEach((k, v) -> {
+                if (!validator.validate(v)) {
+                    throw new InvalidFeatureValueDefinitionException("Invalid value for FeatureValue");
+                }
+            });
+        }
+
+        CategoryLogic categoryLogic = categoryLogicRepository.findOne(categoryID);
+        if(categoryLogic == null) {
+            throw new CategoryNotFoundException("Category not found for given ID");
+        }
+
+        Optional<FeatureDefinition> featureDefinition = categoryLogic.getFeatureDefinitions().stream().filter(f -> f.getId() == featureDefinitionID).findAny();
+        if(!featureDefinition.isPresent()) {
+            throw new FeatureDefinitionNotFoundException("FeatureDefinition not found for given ID");
+        }
+
+        Optional<FeatureGroup> featureGroup = categoryLogic.getFeatureGroups().stream().filter(f -> f.getId() == featureGroupID).findAny();
+        if(!featureGroup.isPresent()) {
+            throw new FeatureGroupNotFoundException("FeatureGroup not found for given id");
+        }
+
+        FeatureDefinition oldFeatureDefinition = featureDefinition.get();
+        if(oldFeatureDefinition.isMultipleValues() && !newFeatureDefinition.isMultipleValues() && !newFeatureDefinition.isForceUpdate()) {
+            throw new FeatureDefinitionCriticalOperationNotAuthorizedException("Trying to change multipleValues from true to false without 'forceUpdate' flag");
+        }
+
+        oldFeatureDefinition.setMultipleValues(newFeatureDefinition.isMultipleValues());
+        oldFeatureDefinition.setFilterable(newFeatureDefinition.isFilterable());
+        oldFeatureDefinition.setVisible(newFeatureDefinition.isVisible());
+        oldFeatureDefinition.setName(newFeatureDefinition.getName());
+        oldFeatureDefinition.setFeatureGroup(featureGroup.get());
+        if(givenNewValues != null) {
+            for (Map.Entry<Long, String> givenEntry : newFeatureDefinition.getValues().entrySet()) {
+                for (FeatureValue featureValue : oldFeatureDefinition.getFeatureValueDefinitions()) {
+                    if (givenEntry.getKey() == featureValue.getID()) {
+                        featureValue.setValue(givenEntry.getValue());
+                    }
+                }
+            }
+        }
+
+        categoryLogicRepository.saveAndFlush(categoryLogic);
+        return categoryLogic;
     }
 }

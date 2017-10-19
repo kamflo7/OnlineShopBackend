@@ -133,4 +133,20 @@ public class FeatureDefinition {
     public boolean isVisible() {
         return visible;
     }
+
+    public void setFeatureGroup(FeatureGroup featureGroup) {
+        this.featureGroup = featureGroup;
+    }
+
+    public void setMultipleValues(boolean multipleValues) {
+        this.multipleValues = multipleValues;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 }
