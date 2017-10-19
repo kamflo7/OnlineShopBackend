@@ -66,6 +66,11 @@ public class CategoryService {
             throw new InvalidFeatureGroupNameException("Invalid name");
         }
 
+        Optional<FeatureGroup> foundTheSameGroupName = categoryLogic.getFeatureGroups().stream().filter(f -> f.getName().equals(name)).findAny();
+        if(foundTheSameGroupName.isPresent()) {
+            throw new InvalidFeatureGroupNameException("This name is already taken for existing group in this category");
+        }
+
         FeatureGroup featureGroup = new FeatureGroup(name);
         categoryLogic.addFeatureGroup(featureGroup);
         categoryLogicRepository.saveAndFlush(categoryLogic);
