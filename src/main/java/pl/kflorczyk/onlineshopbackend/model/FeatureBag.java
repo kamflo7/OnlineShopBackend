@@ -49,6 +49,10 @@ public class FeatureBag {
         featureValues.add(value);
     }
 
+    public void setFeatureValues(List<FeatureValue> featureValues) {
+        this.featureValues = featureValues;
+    }
+
     @Override
     public String toString() {
         String s = String.format("[%d:%s] -> [%d: ", featureDefinition.getId(), featureDefinition.getName(), this.id);
@@ -57,5 +61,9 @@ public class FeatureBag {
         }
         s += "]";
         return s;
+    }
+
+    public long getId() {
+        return id;
     }
 }

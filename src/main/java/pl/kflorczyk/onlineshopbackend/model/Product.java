@@ -102,4 +102,8 @@ public class Product {
     public String toString() {
         return String.format("%d:%s", ID, name);
     }
+
+    public long getID() {
+        return ID;
+    }
 }

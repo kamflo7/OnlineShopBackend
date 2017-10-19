@@ -153,6 +153,40 @@ public class CategoryController {
         return result;
     }
 
+    @PostMapping(path = "/categories/{categoryID}/products/{productID}")
+    public String editProduct(
+            @PathVariable(name = "categoryID") long categoryID,
+            @PathVariable(name = "productID") long productID,
+            @RequestBody ProductDTO productDTO
+    ) {
+        Product product = null;
+
+        try {
+            product = productService.editProduct(categoryID, productDTO);
+        } catch(IncompatibleFeatureValueDefinitionAssignmentException |
+                IncompatibleFeatureDefinitionAssignmentException |
+                CategoryNotFoundException |
+                InvalidProductNameException |
+                InvalidProductDescriptionException e) {
+            try {
+                return new ObjectMapper().writeValueAsString(new Response<>(Response.Status.FAILURE, e.getMessage()));
+            } catch (JsonProcessingException e1) {
+                return null;
+            }
+        }
+
+        String result = null;
+        try {
+            result = new ObjectMapper()
+                    .writer(getJSONFilters(Claimant.PRODUCT))
+                    .writeValueAsString(new Response<>(product));
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+
+        return result;
+    }
+
     @PostMapping(path = "/categories/{categoryID}/feature_groups/{groupID}/feature_definitions/{featureID}")
     public String editFeatureDefinition(
             @PathVariable(name = "categoryID") long categoryID,

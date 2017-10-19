@@ -40,4 +40,17 @@ public class FeatureBagDTO {
     public void addFeatureValue(FeatureValue featureValue) {
         this.featureValues.add(featureValue);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(featureDefinition.getId() + ":"+featureDefinition.getName() + " -> [");
+
+        for(FeatureValue fv : featureValues) {
+            sb.append(fv.getID() + ":" + fv.getValue() + ", ");
+        }
+        sb.append("]");
+
+        return sb.toString();
+    }
 }

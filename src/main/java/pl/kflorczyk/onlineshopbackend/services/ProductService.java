@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -111,7 +112,7 @@ public class ProductService {
         return true;
     }
 
-    public Product createProduct(CategoryLogic categoryLogic, String name, String description, BigDecimal price, int amount, List<FeatureBagDTO> features) {
+    private Product createProduct(CategoryLogic categoryLogic, String name, String description, BigDecimal price, int amount, List<FeatureBagDTO> features) {
         ProductValidator validator = new ProductValidator(name, description);
         if(!validator.validateName()) {
             throw new InvalidProductNameException("Invalid product name");
@@ -136,7 +137,61 @@ public class ProductService {
             throw new CategoryNotFoundException("Category not found for given ID");
         }
 
-        // translates given Map of Features IDs to appropriate app logic type - List<FeatureBag>
+        List<FeatureBagDTO> outputTranslatedFeatures = convertProductRawDataToFeatureBagDTO(categoryLogic, features);
+        return createProduct(categoryLogic, name, description, price, amount, outputTranslatedFeatures);
+    }
+
+    public Product createProduct(long categoryLogicID, ProductDTO productDTO) {
+        return createProduct(categoryLogicID, productDTO.getName(), productDTO.getDescription(), productDTO.getPrice(), productDTO.getAmount(), productDTO.getFeatures());
+    }
+
+    public Product editProduct(long productID, ProductDTO data) {
+        if(data == null)
+            throw new NullPointerException("ProductDTO is null");
+
+        Product product = productRepository.findOne(productID);
+        if(product == null)
+            throw new ProductNotFoundException("Product not found for given id");
+
+        CategoryLogic categoryLogic = product.getCategoryLogic();
+        ProductValidator validator = new ProductValidator(data.getName(), data.getDescription());
+
+        if(data.getName() != null) { // update name if present
+            if(!validator.validateName()) {
+                throw new InvalidProductNameException("Invalid product name");
+            }
+            product.setName(data.getName());
+        }
+
+        if(data.getDescription() != null) { // update description if present
+            if(!validator.validateDescription()) {
+                throw new InvalidProductDescriptionException("Invalid product description");
+            }
+            product.setDescription(data.getDescription());
+        }
+
+        if(data.getPrice() != null) // update price if present
+            product.setPrice(data.getPrice());
+
+        if(data.getAmount() != null) // update amount if present
+            product.setAmount(data.getAmount());
+
+        Map<Long, List<Long>> rawFeatures = data.getFeatures();
+        if(rawFeatures != null) { // update feature values if present
+            List<FeatureBagDTO> realFeatureValues = convertProductRawDataToFeatureBagDTO(categoryLogic, rawFeatures);
+            for(FeatureBagDTO featureBagDTO : realFeatureValues) {
+                Optional<FeatureBag> realFeatureBag = product.getFeatureBags().stream().filter(f -> f.getFeatureDefinition().getId() == featureBagDTO.getFeatureDefinition().getId()).findAny();
+                if(realFeatureBag.isPresent()) {
+                    realFeatureBag.get().setFeatureValues(featureBagDTO.getFeatureValues());
+                }
+            }
+        }
+
+        productRepository.saveAndFlush(product);
+        return product;
+    }
+
+    public List<FeatureBagDTO> convertProductRawDataToFeatureBagDTO(CategoryLogic categoryLogic, Map<Long, List<Long>> features) {
         List<FeatureBagDTO> outputTranslatedFeatures = new ArrayList<>();
         List<FeatureDefinition> featureDefinitions = categoryLogic.getFeatureDefinitions();
         for(Map.Entry<Long, List<Long>> givenFeature : features.entrySet()) {
@@ -178,11 +233,6 @@ public class ProductService {
 
             outputTranslatedFeatures.add(featureBagDTO);
         }
-
-        return createProduct(categoryLogic, name, description, price, amount, outputTranslatedFeatures);
-    }
-
-    public Product createProduct(long categoryLogicID, ProductDTO productDTO) {
-        return createProduct(categoryLogicID, productDTO.getName(), productDTO.getDescription(), productDTO.getPrice(), productDTO.getAmount(), productDTO.getFeatures());
+        return outputTranslatedFeatures;
     }
 }

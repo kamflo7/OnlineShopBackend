@@ -1,11 +1,14 @@
 package pl.kflorczyk.onlineshopbackend.repositories;
 
 import org.assertj.core.util.Lists;
+import org.assertj.core.util.Maps;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import pl.kflorczyk.onlineshopbackend.dto.FeatureBagDTO;
+import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
@@ -91,6 +94,7 @@ public class ProductRepositoryTests {
         featureDefScreenInches.setFeatureValueDefinitions(Lists.newArrayList(screen47, screen5, screen63));
         featureDefScreenInchesRange.setFeatureValueDefinitions(Lists.newArrayList(screenRange48_54, screenRange55_6, screen63));
         featureDefConnection.setFeatureValueDefinitions(Lists.newArrayList(connWifi, connNfc, connBt42));
+        featureDefResolution.setFeatureValueDefinitions(Lists.newArrayList(res1920x1080, res1280x720, res2960x1440));
 
         categoryLogicSmartphones.addFeatureGroup(featureGroupTechInfo);
         categoryLogicSmartphones.addFeatureDefinition(featureDefCpu);
@@ -156,8 +160,134 @@ public class ProductRepositoryTests {
 
         Product obtained = productService.getProducts(categoryLogicSmartphones).get(0);
 
-        assertThat(obtained.getName()).isEqualTo("Huawei Mate 4");
+
         assertThat(obtained.getCategoryLogic().getID()).isEqualTo(categoryLogicSmartphones.getID());
         assertThat(obtained.getFeatureBags().size()).isEqualTo(4);
+
+        ProductTest test = new ProductTest(obtained);
+        assertThat(test.has(featureDefRAM, ram4GB)).isTrue();
+        assertThat(test.has(featureDefInternalStorage, storage32GB)).isTrue();
+        assertThat(test.has(featureDefScreenInches, screen63)).isTrue();
+        assertThat(test.has(featureDefConnection, connWifi, connBt42, connNfc)).isTrue();
+        assertThat(obtained.getName()).isEqualTo("Huawei Mate 4");
+        assertThat(obtained.getDescription()).isEqualTo("Najnowszy telefon z premiera w pazdzierniku 2017 (chyba)");
+        assertThat(obtained.getAmount()).isEqualTo(15);
+        assertThat(obtained.getPrice().compareTo(new BigDecimal("1980.0"))).isEqualTo(0);
+    }
+
+    @Test
+    public void shouldEditProduct() {
+        setupDatabaseStructure();
+        productService = new ProductService(productRepository, categoryLogicRepository);
+
+        ProductDTO givenCreatingDTO = new ProductDTO("Huawei Testowy", "Spoko telefon", new BigDecimal("1000.00"), 100);
+        Map<Long, List<Long>> givenCreatingFeatures = new HashMap<>();
+        givenCreatingFeatures.put(featureDefRAM.getId(), Lists.newArrayList(ram2GB.getID()));
+        givenCreatingFeatures.put(featureDefInternalStorage.getId(), Lists.newArrayList(storage8GB.getID()));
+        givenCreatingFeatures.put(featureDefConnection.getId(), Lists.newArrayList(connWifi.getID(), connBt42.getID(), connNfc.getID()));
+        givenCreatingFeatures.put(featureDefResolution.getId(), Lists.newArrayList(res1920x1080.getID()));
+        givenCreatingDTO.setFeatures(givenCreatingFeatures);
+
+        Product createdProduct = null;
+        try {
+            createdProduct = productService.createProduct(categoryLogicSmartphones.getID(), givenCreatingDTO);
+        }  catch(RuntimeException e) {
+            fail("Should not throw RuntimeException [creating]: " + e.getMessage());
+        }
+
+        // edit:
+        ProductDTO givenEditDTO = new ProductDTO();
+        givenEditDTO.setDescription("Zmiana opisu telefonu");
+        givenEditDTO.setPrice(new BigDecimal("2000.00"));
+        Map<Long, List<Long>> givenEditFeatures = new HashMap<>();
+        givenEditFeatures.put(featureDefRAM.getId(), Lists.newArrayList(ram4GB.getID()));
+        givenEditFeatures.put(featureDefInternalStorage.getId(), Lists.newArrayList(storage16GB.getID()));
+        givenEditDTO.setFeatures(givenEditFeatures);
+
+        Product editedProduct = null;
+        try {
+            editedProduct = productService.editProduct(createdProduct.getID(), givenEditDTO);
+        }  catch(RuntimeException e) {
+            fail("Should not throw RuntimeException [editing]: " + e.getMessage());
+        }
+
+        ProductTest test = new ProductTest(editedProduct);
+        assertThat(test.has(featureDefRAM, ram4GB)).isTrue();
+        assertThat(test.has(featureDefInternalStorage, storage16GB)).isTrue();
+        assertThat(test.has(featureDefConnection, connWifi, connBt42, connNfc)).isTrue();
+        assertThat(test.has(featureDefResolution, res1920x1080)).isTrue();
+        assertThat(editedProduct.getDescription()).isEqualTo("Zmiana opisu telefonu");
+        assertThat(editedProduct.getPrice().compareTo(new BigDecimal("2000.00"))).isEqualTo(0);
+    }
+
+    @Test
+    public void shouldReturnCorrectEntitiesForGivenIDs() {
+        setupDatabaseStructure();
+        productService = new ProductService(productRepository, categoryLogicRepository);
+
+        Map<Long, List<Long>> setupFeatures = new HashMap<>();
+        setupFeatures.put(featureDefRAM.getId(), Lists.newArrayList(ram2GB.getID()));
+        setupFeatures.put(featureDefInternalStorage.getId(), Lists.newArrayList(storage8GB.getID()));
+        setupFeatures.put(featureDefConnection.getId(), Lists.newArrayList(connWifi.getID(), connBt42.getID(), connNfc.getID()));
+        setupFeatures.put(featureDefResolution.getId(), Lists.newArrayList(res1920x1080.getID()));
+
+        List<FeatureBagDTO> converted = productService.convertProductRawDataToFeatureBagDTO(categoryLogicSmartphones, setupFeatures);
+        List<FeatureDefinition> featureDefinitions = categoryLogicSmartphones.getFeatureDefinitions();
+
+        int matchedDefs = 0;
+
+        for(FeatureBagDTO bag : converted) {
+            for(FeatureDefinition fd : featureDefinitions) {
+                if(bag.getFeatureDefinition().getId() == fd.getId()) {
+                    matchedDefs++;
+
+                    int matchedValues = 0;
+                    int needValuesToMatch = setupFeatures.get(fd.getId()).size();
+
+                    for(FeatureValue fv : bag.getFeatureValues()) {
+                        for(FeatureValue realFeatureValue : fd.getFeatureValueDefinitions()) {
+                            if(realFeatureValue.getID() == fv.getID())
+                                matchedValues++;
+                        }
+                    }
+
+                    assertThat(matchedValues).isEqualTo(needValuesToMatch);
+                }
+            }
+        }
+
+        assertThat(matchedDefs).isEqualTo(setupFeatures.size());
+    }
+
+    private class ProductTest {
+        private Product product;
+
+        public ProductTest(Product product) {
+            this.product = product;
+        }
+
+        public boolean has(FeatureDefinition fd, FeatureValue... fvs) {
+            boolean featureDefFound = false;
+
+            List<FeatureBag> featureBags = product.getFeatureBags();
+            for(FeatureBag bag : featureBags) {
+                if(bag.getFeatureDefinition().getId() == fd.getId()) {
+                    int foundCount = 0;
+                    featureDefFound = true;
+
+                    for(FeatureValue fv : fvs) {
+                        for(FeatureValue realFV : bag.getFeatureValues()) {
+                            if(fv.getID() == realFV.getID())
+                                foundCount++;
+                        }
+                    }
+
+                    if(foundCount != fvs.length)
+                        return false;
+                }
+            }
+
+            return featureDefFound;
+        }
     }
 }

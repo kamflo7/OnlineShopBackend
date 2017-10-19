@@ -7,7 +7,7 @@ import java.util.Map;
 public class ProductDTO {
     private String name, description;
     private BigDecimal price;
-    private int amount;
+    private Integer amount;
 
     private Map<Long, List<Long>> features;
 
@@ -44,7 +44,7 @@ public class ProductDTO {
         this.price = price;
     }
 
-    public int getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
