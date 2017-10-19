@@ -1,16 +1,25 @@
-package pl.kflorczyk.onlineshopbackend.repositories;
+package pl.kflorczyk.onlineshopbackend.servicesAndRepositories;
 
+import org.assertj.core.api.Java6Assertions;
 import org.assertj.core.util.Lists;
 import org.assertj.core.util.Maps;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureBagDTO;
+import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
 import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
+import pl.kflorczyk.onlineshopbackend.exceptions.CategoryAlreadyExistsException;
+import pl.kflorczyk.onlineshopbackend.exceptions.InvalidFeatureValueDefinitionException;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
+import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
+import pl.kflorczyk.onlineshopbackend.repositories.CategoryViewRepository;
+import pl.kflorczyk.onlineshopbackend.repositories.ProductRepository;
+import pl.kflorczyk.onlineshopbackend.services.CategoryService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
 import java.math.BigDecimal;
@@ -20,11 +29,12 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class ProductRepositoryTests {
+public class ProductAndCategoryTests {
 
     @Autowired
     private ProductRepository productRepository;
@@ -32,43 +42,16 @@ public class ProductRepositoryTests {
     @Autowired
     private CategoryLogicRepository categoryLogicRepository;
 
+    @Autowired
+    private CategoryViewRepository categoryViewRepository;
+
     private ProductService productService;
+    private CategoryService categoryService;
 
-    private void setupDatabaseContent() {
-        String[] phoneNames =   new String[] { "Samsung Galaxy Note 8", "Huawei P8 Lite", "Samsung Galaxy A3 (2017)", "Huawei Honor 4X", "Huawei Honor 8" };
-        String[] prices =       new String[] { "4299.0", "801.61", "1198.0", "1034.49", "1499.0" };
-
-        FeatureValue[] ram =    new FeatureValue[] { ram6GB, ram2GB, ram2GB, ram2GB, ram4GB};
-        FeatureValue[] inches = new FeatureValue[] { screen63, screen5, screen47, screen55, screen52};
-        FeatureValue[] inchesR= new FeatureValue[] { screenRange6plus, screenRange48_54, screenRange41_47, screenRange55_6, screenRange48_54};
-        FeatureValue[] res =    new FeatureValue[] { res2960x1440, res1280x720, res1280x720, res1280x720, res1920x1080};
-
-        List<List<FeatureValue>> cn= Lists.newArrayList(
-                Lists.newArrayList(connNfc, connBt42, connWifi),
-                Lists.newArrayList(connBt42),
-                Lists.newArrayList(connWifi),
-                Lists.newArrayList(connBt42, connWifi),
-                Lists.newArrayList(connNfc, connWifi)
-        );
-
-        for(int i=0; i<phoneNames.length; i++) {
-            Product p = new Product(phoneNames[i], new BigDecimal(prices[i]), 100, "Some description index " + i, categoryLogicSmartphones);
-            p.addFeature(new FeatureBag(featureDefRAM, ram[i]));
-            p.addFeature(new FeatureBag(featureDefScreenInches, inches[i]));
-            p.addFeature(new FeatureBag(featureDefScreenInchesRange, inchesR[i]));
-            p.addFeature(new FeatureBag(featureDefResolution, res[i]));
-            p.addFeature(new FeatureBag(featureDefConnection, cn.get(i)));
-            productRepository.save(p);
-        }
-        productRepository.flush();
+    @Before
+    public void setup() {
+        categoryService = new CategoryService(categoryViewRepository, categoryLogicRepository);
     }
-
-    private CategoryLogic categoryLogicSmartphones;
-    private FeatureGroup featureGroupTechInfo;
-    private FeatureDefinition featureDefCpu, featureDefRAM, featureDefInternalStorage, featureDefScreenInches, featureDefScreenInchesRange, featureDefResolution, featureDefConnection;
-    private FeatureValue    ram2GB, ram3GB, ram4GB, ram6GB, storage8GB, storage16GB, storage32GB, screen63, screen5, screen52, screen55, screen47, screenRange41_47, screenRange48_54, screenRange55_6, screenRange6plus,
-                            res2960x1440, res1280x720, res1920x1080,
-                            connWifi, connBt42, connNfc;
 
     public void setupDatabaseStructure() {
         categoryLogicSmartphones = new CategoryLogic("Smartfony");
@@ -106,6 +89,96 @@ public class ProductRepositoryTests {
         categoryLogicSmartphones.addFeatureDefinition(featureDefConnection);
 
         categoryLogicRepository.saveAndFlush(categoryLogicSmartphones);
+    }
+
+    private void setupDatabaseContent() {
+        String[] phoneNames =   new String[] { "Samsung Galaxy Note 8", "Huawei P8 Lite", "Samsung Galaxy A3 (2017)", "Huawei Honor 4X", "Huawei Honor 8" };
+        String[] prices =       new String[] { "4299.0", "801.61", "1198.0", "1034.49", "1499.0" };
+
+        FeatureValue[] ram =    new FeatureValue[] { ram6GB, ram2GB, ram2GB, ram2GB, ram4GB};
+        FeatureValue[] inches = new FeatureValue[] { screen63, screen5, screen47, screen55, screen52};
+        FeatureValue[] inchesR= new FeatureValue[] { screenRange6plus, screenRange48_54, screenRange41_47, screenRange55_6, screenRange48_54};
+        FeatureValue[] res =    new FeatureValue[] { res2960x1440, res1280x720, res1280x720, res1280x720, res1920x1080};
+
+        List<List<FeatureValue>> cn= Lists.newArrayList(
+                Lists.newArrayList(connNfc, connBt42, connWifi),
+                Lists.newArrayList(connBt42),
+                Lists.newArrayList(connWifi),
+                Lists.newArrayList(connBt42, connWifi),
+                Lists.newArrayList(connNfc, connWifi)
+        );
+
+        for(int i=0; i<phoneNames.length; i++) {
+            Product p = new Product(phoneNames[i], new BigDecimal(prices[i]), 100, "Some description index " + i, categoryLogicSmartphones);
+            p.addFeature(new FeatureBag(featureDefRAM, ram[i]));
+            p.addFeature(new FeatureBag(featureDefScreenInches, inches[i]));
+            p.addFeature(new FeatureBag(featureDefScreenInchesRange, inchesR[i]));
+            p.addFeature(new FeatureBag(featureDefResolution, res[i]));
+            p.addFeature(new FeatureBag(featureDefConnection, cn.get(i)));
+            productRepository.save(p);
+        }
+        productRepository.flush();
+    }
+
+    private CategoryLogic categoryLogicSmartphones;
+    private FeatureGroup featureGroupTechInfo;
+    private FeatureDefinition featureDefCpu, featureDefRAM, featureDefInternalStorage, featureDefScreenInches, featureDefScreenInchesRange, featureDefResolution, featureDefConnection;
+    private FeatureValue    ram2GB, ram3GB, ram4GB, ram6GB, storage8GB, storage16GB, storage32GB, screen63, screen5, screen52, screen55, screen47, screenRange41_47, screenRange48_54, screenRange55_6, screenRange6plus,
+                            res2960x1440, res1280x720, res1920x1080,
+                            connWifi, connBt42, connNfc;
+
+    @Test
+    public void shouldCreateCategoryAndReturnNullForAttemptToCreateExistCategory() {
+        CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
+        int exceptions = 0;
+
+        try {
+            CategoryLogic smartfony2 = categoryService.createNewCategory("Smartfony");
+        } catch(CategoryAlreadyExistsException e) {
+            exceptions++;   // not found opposite method to junit.fail()
+        }
+
+        try {
+            CategoryLogic smartfony3 = categoryService.createNewCategory("smartfony");
+        } catch(CategoryAlreadyExistsException e) {
+            exceptions++;
+        }
+
+
+        assertThat(exceptions).isEqualTo(2);
+        assertThat(smartfony).isNotNull();
+    }
+
+    @Test
+    public void shouldCreateFeatureGroupForCategory() {
+        CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
+        long id = smartfony.getID();
+
+        categoryService.createFeatureGroup("Informacje techniczne", smartfony);
+        FeatureGroup obtained = categoryService.getCategoriesLogic().get(0).getFeatureGroups().get(0);
+        assertThat(obtained.getName()).isEqualTo("Informacje techniczne");
+    }
+
+    @Test
+    public void shouldCreateFeatureDefinitionsAndTheirPotentialValuesForCategory() {
+        CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
+        categoryService.createFeatureGroup("Informacje techniczne", smartfony);
+        FeatureGroup informacje_techniczne = smartfony.getFeatureGroups().stream().filter(g -> g.getName().equals("Informacje techniczne")).findAny().get();
+
+        FeatureDefinitionDTO featureDefinitionDTO = new FeatureDefinitionDTO(false, true, true, "Pamięć RAM",
+                Lists.newArrayList("512MB", "1GB", "2GB", "3GB", "4GB"));
+        try {
+            categoryService.createFeatureDefinition(featureDefinitionDTO, informacje_techniczne, smartfony);
+        } catch (InvalidFeatureValueDefinitionException e) {
+            Java6Assertions.fail("createFeatureDefinition method should not throw exception");
+        }
+
+        //
+        CategoryLogic smartfonyObtained = categoryService.getCategoryLogic("Smartfony");
+        List<FeatureDefinition> featureDefinitionsObtained = smartfonyObtained.getFeatureDefinitions();
+
+        assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().size()).isEqualTo(featureDefinitionDTO.getValues().size());
+        assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().get(0).getValue()).isEqualTo(featureDefinitionDTO.getValues().get(0));
     }
 
     @Test
@@ -159,7 +232,6 @@ public class ProductRepositoryTests {
         }
 
         Product obtained = productService.getProducts(categoryLogicSmartphones).get(0);
-
 
         assertThat(obtained.getCategoryLogic().getID()).isEqualTo(categoryLogicSmartphones.getID());
         assertThat(obtained.getFeatureBags().size()).isEqualTo(4);

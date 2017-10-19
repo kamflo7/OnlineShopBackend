@@ -15,16 +15,15 @@ public class UserService {
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
 
-//    public UserService(@Autowired UserRepository userRepository, @Autowired PasswordEncoder passwordEncoder) {
-//        this.userRepository = userRepository;
-//        this.passwordEncoder = passwordEncoder;
-//    }
-
     private boolean userExists(String email) {
         return userRepository.findByEmail(email) != null;
     }
 
     public User registerUser(String email, String password) {
+        if(email == null || password == null) {
+            throw new NullPointerException("Argument cannot be null");
+        }
+
         if(userExists(email)) {
             throw new EmailAlreadyExistsException("Email already exists");
         }
@@ -40,12 +39,15 @@ public class UserService {
         User user = new User();
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        userRepository.save(user);
-
+        userRepository.saveAndFlush(user);
         return user;
     }
 
     public User loginUser(String email, String password) {
+        if(email == null || password == null) {
+            throw new NullPointerException("Argument cannot be null");
+        }
+
         User user = getUser(email);
 
         if(user == null) {
