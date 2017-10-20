@@ -274,7 +274,6 @@ public class CategoryController {
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
                             "id", "featureGroup", "categoryLogic", "featureValueDefinitions"
                     ));
-
         } else if(claimant == Claimant.CATEGORY_LOGIC) {
             return new SimpleFilterProvider()
                     .addFilter("Product", SimpleBeanPropertyFilter.serializeAll())
