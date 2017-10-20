@@ -13,6 +13,7 @@ import pl.kflorczyk.onlineshopbackend.dto.FeatureBagDTO;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
 import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.CategoryAlreadyExistsException;
+import pl.kflorczyk.onlineshopbackend.exceptions.FeatureDefinitionAlreadyExists;
 import pl.kflorczyk.onlineshopbackend.exceptions.InvalidFeatureValueDefinitionException;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
@@ -128,7 +129,7 @@ public class ProductAndCategoryTests {
                             connWifi, connBt42, connNfc;
 
     @Test
-    public void shouldCreateCategoryAndReturnNullForAttemptToCreateExistCategory() {
+    public void createCategory_and_preventFromCreateExistingName() {
         CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
         int exceptions = 0;
 
@@ -150,7 +151,7 @@ public class ProductAndCategoryTests {
     }
 
     @Test
-    public void shouldCreateFeatureGroupForCategory() {
+    public void createFeatureGroup() {
         CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
         long id = smartfony.getID();
 
@@ -160,17 +161,26 @@ public class ProductAndCategoryTests {
     }
 
     @Test
-    public void shouldCreateFeatureDefinitionsAndTheirPotentialValuesForCategory() {
+    public void createFeatureDefinitionWithItsValues() {
         CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
         categoryService.createFeatureGroup("Informacje techniczne", smartfony);
         FeatureGroup informacje_techniczne = smartfony.getFeatureGroups().stream().filter(g -> g.getName().equals("Informacje techniczne")).findAny().get();
 
         FeatureDefinitionDTO featureDefinitionDTO = new FeatureDefinitionDTO(false, true, true, "Pamięć RAM",
                 Lists.newArrayList("512MB", "1GB", "2GB", "3GB", "4GB"));
+
+        boolean shouldFail = false;
+
         try {
             categoryService.createFeatureDefinition(featureDefinitionDTO, informacje_techniczne, smartfony);
         } catch (InvalidFeatureValueDefinitionException e) {
-            Java6Assertions.fail("createFeatureDefinition method should not throw exception");
+            fail("createFeatureDefinition method should not throw exception");
+        }
+
+        try {
+            categoryService.createFeatureDefinition(featureDefinitionDTO, informacje_techniczne, smartfony);
+        } catch (FeatureDefinitionAlreadyExists e) {
+            shouldFail = true;
         }
 
         //
@@ -179,10 +189,11 @@ public class ProductAndCategoryTests {
 
         assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().size()).isEqualTo(featureDefinitionDTO.getValues().size());
         assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().get(0).getValue()).isEqualTo(featureDefinitionDTO.getValues().get(0));
+        assertThat(shouldFail).isTrue();
     }
 
     @Test
-    public void shouldReturnFilteredProducts() {
+    public void getProducts_withGivenFilterParameters() {
         setupDatabaseStructure();
         setupDatabaseContent();
 
@@ -203,17 +214,7 @@ public class ProductAndCategoryTests {
     }
 
     @Test
-    public void shouldReturnAllProductsInCategory() {
-        setupDatabaseStructure();
-        setupDatabaseContent();
-
-        CategoryLogic c = CategoryLogic.ofID(categoryLogicSmartphones.getID());
-        List<Product> byCategoryLogic = productRepository.findByCategoryLogic(c);
-        assertThat(byCategoryLogic.size()).isGreaterThan(0);
-    }
-
-    @Test
-    public void shouldCreateProduct() {
+    public void createProduct() {
         setupDatabaseStructure();
         productService = new ProductService(productRepository, categoryLogicRepository);
 
@@ -248,7 +249,7 @@ public class ProductAndCategoryTests {
     }
 
     @Test
-    public void shouldEditProduct() {
+    public void editProduct() {
         setupDatabaseStructure();
         productService = new ProductService(productRepository, categoryLogicRepository);
 
@@ -293,7 +294,7 @@ public class ProductAndCategoryTests {
     }
 
     @Test
-    public void shouldReturnCorrectEntitiesForGivenIDs() {
+    public void shouldCorrectlyValidateAndTranslateGivenLongIndexesToBussinessLogic() {
         setupDatabaseStructure();
         productService = new ProductService(productRepository, categoryLogicRepository);
 

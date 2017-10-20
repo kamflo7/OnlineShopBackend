@@ -92,6 +92,10 @@ public class CategoryService {
             throw new InvalidFeatureDefinitionNameException("Invalid name");
         }
 
+        if(categoryLogic.getFeatureDefinitions().stream().filter(f -> f.getName().equals(featureDefinitionDTO.getName())).findAny().isPresent()) {
+            throw new FeatureDefinitionAlreadyExists("The given name for FeatureDefinition is already taken");
+        }
+
         SimpleNameValidator validator = new SimpleNameValidator(3);
         featureDefinitionDTO.getValues().stream().forEach( f -> {
             if(!validator.validate(f)) {
@@ -104,8 +108,6 @@ public class CategoryService {
 
         List<FeatureValue> featureValues = new ArrayList<>(featureDefinitionDTO.getValues().size());
         featureDefinitionDTO.getValues().stream().forEach(f -> featureValues.add(new FeatureValue(f)));
-//        featureDefinitionDTO.getValues().forEach(f -> featureValues.add(new FeatureValue(f)));
-        // todo: deal with this above
 
         featureDefinition.setFeatureValueDefinitions(featureValues);
         categoryLogicRepository.saveAndFlush(categoryLogic);
@@ -180,6 +182,10 @@ public class CategoryService {
         CategoryLogic categoryLogic = categoryLogicRepository.findOne(categoryID);
         if(categoryLogic == null) {
             throw new CategoryNotFoundException("Category not found for given ID");
+        }
+
+        if(categoryLogic.getFeatureDefinitions().stream().filter(f -> f.getName().equals(newFeatureDefinition.getName())).findAny().isPresent()) {
+            throw new FeatureDefinitionAlreadyExists("The given name for FeatureDefinition is already taken");
         }
 
         Optional<FeatureDefinition> featureDefinition = categoryLogic.getFeatureDefinitions().stream().filter(f -> f.getId() == featureDefinitionID).findAny();

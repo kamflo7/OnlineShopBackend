@@ -83,20 +83,32 @@ public class CategoryController {
     }
 
     @PutMapping(path = "/categories/{categoryID}/feature_groups/{groupID}/feature_definitions")
-    public Response<CategoryLogic> createFeatureDefinition(
+    public String createFeatureDefinition(
             @PathVariable(name = "categoryID") long categoryID,
             @PathVariable(name = "groupID") long groupID,
             @RequestBody FeatureDefinitionDTO featureDTO
     ) {
         CategoryLogic categoryLogic = null;
+        String result = null;
 
         try {
             categoryLogic = categoryService.createFeatureDefinition(featureDTO, groupID, categoryID);
-        } catch(CategoryNotFoundException | FeatureGroupNotFoundException | InvalidFeatureDefinitionNameException | InvalidFeatureValueDefinitionException e) {
-            return new Response<>(Response.Status.FAILURE, e.getMessage());
+        } catch(CategoryNotFoundException | FeatureDefinitionAlreadyExists | FeatureGroupNotFoundException | InvalidFeatureDefinitionNameException | InvalidFeatureValueDefinitionException e) {
+            try {
+                return new ObjectMapper().writeValueAsString(new Response<CategoryLogic>(Response.Status.FAILURE, e.getMessage()));
+            } catch (JsonProcessingException e1) {
+                return null;
+            }
         }
 
-        return new Response<>(categoryLogic);
+        try {
+            result = new ObjectMapper()
+                    .writer(getJSONFilters(Claimant.CATEGORY_LOGIC))
+                    .writeValueAsString(new Response<>(categoryLogic));
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+        return result;
     }
 
     @GetMapping(path = "/categories/{categoryID}/products")
