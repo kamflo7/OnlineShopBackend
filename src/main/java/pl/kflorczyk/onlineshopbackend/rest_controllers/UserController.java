@@ -69,9 +69,19 @@ public class UserController {
         return editAddress(userID, addressID, dto);
     }
 
-    @PostMapping(path = "/users/{userID}/addresses/{addressID}company")
+    @PostMapping(path = "/users/{userID}/addresses/{addressID}/company")
     public Response editAddress(@PathVariable(name = "userID") long userID, @PathVariable(name = "addressID") long addressID, @RequestBody CompanyAddressDTO dto) {
         return editAddress(userID, addressID, dto);
+    }
+
+    @PutMapping(path = "/users/{userID}/addresses/{addressID}/default")
+    public Response setDefaultAddress(@PathVariable(name = "userID") long userID, @PathVariable(name = "addressID") long addressID) {
+        try {
+            userService.setDefaultAddress(userID, addressID);
+        } catch(UserNotFoundException | UserAddressNotFoundException e) {
+            return new Response(Response.Status.FAILURE, e.getMessage());
+        }
+        return new Response(Response.Status.SUCCESS);
     }
 
     private Response createAddress(long userID, UserAddressDTO dto) {

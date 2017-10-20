@@ -138,4 +138,19 @@ public class UserService {
         user.addAddress(userAddress);
         userRepository.saveAndFlush(user);
     }
+
+    public void setDefaultAddress(long userID, long addressID) {
+        User user = getUser(userID);
+        if(user == null) {
+            throw new UserNotFoundException("User not found for given id");
+        }
+
+        Optional<UserAddress> persistingAddress = user.getAddresses().stream().filter(a -> a.getID() == addressID).findAny();
+        if(!persistingAddress.isPresent()) {
+            throw new UserAddressNotFoundException("UserAddress not found for given ID");
+        }
+
+        user.getAddresses().forEach(address -> address.setDefault(address.getID() == addressID));
+        userRepository.saveAndFlush(user);
+    }
 }

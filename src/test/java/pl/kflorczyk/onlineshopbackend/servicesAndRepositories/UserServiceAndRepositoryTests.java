@@ -91,4 +91,24 @@ public class UserServiceAndRepositoryTests {
         assertThat(edited.getPhoneNumber()).isEqualTo(edit.getPhoneNumber());
         assertThat(edited.getID()).isGreaterThan(justPersisted.getID());
     }
+
+    @Test
+    public void setDefaultAddress() {
+        User user = userService.registerUser("john.doe@gmail.com", "123456#^47");
+
+        PersonAddressDTO personDTO = new PersonAddressDTO(122, "32-061", "London", "500100200", "John", "Doe");
+        userService.createUserAddress(user.getID(), personDTO);
+
+        CompanyAddressDTO companyDTO = new CompanyAddressDTO(244, "64-122", "Vandenberg", "333666999", "Something LTD", "1234567891");
+        userService.createUserAddress(user.getID(), companyDTO);
+
+        CompanyAddressDTO companyDTO2 = new CompanyAddressDTO(488, "28-362", "Los Santos", "888999555", "Nothing LTD", "1234567891");
+        userService.createUserAddress(user.getID(), companyDTO2);
+
+        userService.setDefaultAddress(user.getID(), user.getAddresses().get(2).getID());
+
+        int i = 0;
+        for(UserAddress a : user.getAddresses())
+            assertThat((++i == 3) == a.isDefault()).isTrue();
+    }
 }
