@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@JsonFilter("getProductsFilter_featureDefinition")
+@JsonFilter("FeatureDefinition")
 public class FeatureDefinition {
 
     @Id

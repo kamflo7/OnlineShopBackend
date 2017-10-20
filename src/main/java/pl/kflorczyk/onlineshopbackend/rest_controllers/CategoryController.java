@@ -262,24 +262,23 @@ public class CategoryController {
     private FilterProvider getJSONFilters(Claimant claimant) {
         if(claimant == Claimant.MANY_PRODUCTS) {
             return new SimpleFilterProvider()
-                    .addFilter("getProductsFilter_product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
-                    .addFilter("getProductsFilter_featureDefinition",
-                            SimpleBeanPropertyFilter.serializeAllExcept(
+                    .addFilter("Product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
+                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
                                     "categoryLogic", "featureGroup", "featureValueDefinitions",
                                     "visible", "filterable", "multipleValues", "name"));
         } else if(claimant == Claimant.ONE_PRODUCT) {
             return new SimpleFilterProvider()
-                    .addFilter("getProductsFilter_product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
-                    .addFilter("FeatureBagFilter", SimpleBeanPropertyFilter.serializeAllExcept("id"))
-                    .addFilter("FeatureValueFilter", SimpleBeanPropertyFilter.serializeAllExcept("id"))
-                    .addFilter("getProductsFilter_featureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
+                    .addFilter("Product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
+                    .addFilter("FeatureBag", SimpleBeanPropertyFilter.serializeAllExcept("id"))
+                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAllExcept("id"))
+                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
                             "id", "featureGroup", "categoryLogic", "featureValueDefinitions"
                     ));
 
         } else if(claimant == Claimant.CATEGORY_LOGIC) {
             return new SimpleFilterProvider()
-                    .addFilter("getProductsFilter_product", SimpleBeanPropertyFilter.serializeAll())
-                    .addFilter("getProductsFilter_featureDefinition", SimpleBeanPropertyFilter.serializeAll());
+                    .addFilter("Product", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAll());
         }
         return null;
     }

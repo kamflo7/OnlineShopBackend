@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@JsonFilter("FeatureBagFilter")
+@JsonFilter("FeatureBag")
 public class FeatureBag {
 
     @Id
