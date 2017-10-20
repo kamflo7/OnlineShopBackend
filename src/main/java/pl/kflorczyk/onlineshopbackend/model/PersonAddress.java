@@ -1,5 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
+import pl.kflorczyk.onlineshopbackend.dto.PersonAddressDTO;
+
 import javax.persistence.Entity;
 
 @Entity
@@ -22,6 +24,12 @@ public class PersonAddress extends UserAddress {
         super(isDefault);
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public PersonAddress(PersonAddressDTO dto) {
+        super(dto);
+        this.firstName = dto.getFirstName();
+        this.lastName = dto.getLastName();
     }
 
     public String getFirstName() {

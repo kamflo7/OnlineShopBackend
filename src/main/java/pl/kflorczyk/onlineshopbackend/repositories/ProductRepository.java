@@ -9,16 +9,7 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findAll();
 
-    Product findByName(String name);
+    Product findFirst1ByNameIgnoreCase(String name);
 
     List<Product> findByCategoryLogic(CategoryLogic categoryLogic);
-
-//    @Modifying
-//    @Query(value = "INSERT INTO category_logic (name) VALUES (:name)", nativeQuery = true)
-//    @Transactional
-//    void saveCategoryLogic(@Param("name") String name);
-//
-//    @Query(value = "SELECT id, name FROM category_logic WHERE name = (:name) LIMIT 1", nativeQuery = true)
-//    @Transactional
-//    CategoryLogic getCategoryLogic(@Param("name") String name);
 }

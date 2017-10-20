@@ -3,20 +3,36 @@ package pl.kflorczyk.onlineshopbackend.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.kflorczyk.onlineshopbackend.dto.CompanyAddressDTO;
+import pl.kflorczyk.onlineshopbackend.dto.PersonAddressDTO;
+import pl.kflorczyk.onlineshopbackend.dto.UserAddressDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
+import pl.kflorczyk.onlineshopbackend.model.CompanyAddress;
+import pl.kflorczyk.onlineshopbackend.model.PersonAddress;
 import pl.kflorczyk.onlineshopbackend.model.User;
+import pl.kflorczyk.onlineshopbackend.model.UserAddress;
 import pl.kflorczyk.onlineshopbackend.repositories.UserRepository;
 import pl.kflorczyk.onlineshopbackend.validators.EmailValidator;
 import pl.kflorczyk.onlineshopbackend.validators.PasswordValidator;
+import pl.kflorczyk.onlineshopbackend.validators.UserAddressValidator;
 
 @Service
 public class UserService {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private PasswordEncoder passwordEncoder;
+    private UserRepository userRepository;
+    private PasswordEncoder passwordEncoder;
+
+    public UserService(@Autowired  UserRepository userRepository, @Autowired  PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     private boolean userExists(String email) {
         return userRepository.findByEmail(email) != null;
+    }
+
+    public User getUser(long id) {
+        return userRepository.findOne(id);
     }
 
     public User registerUser(String email, String password) {
@@ -63,5 +79,30 @@ public class UserService {
 
     public User getUser(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public void createUserAddress(long userID, UserAddressDTO addressDTO) {
+        if(addressDTO == null) {
+            throw new NullPointerException("UserAddressDTO is null");
+        }
+
+        if(!new UserAddressValidator(addressDTO).validate()) {
+            throw new InvalidAddressException("Invalid address");
+        }
+
+        User user = getUser(userID);
+        if(user == null) {
+            throw new UserNotFoundException("User not found for given id");
+        }
+
+        UserAddress userAddress = null;
+        if(addressDTO instanceof PersonAddressDTO) {
+            userAddress = new PersonAddress((PersonAddressDTO) addressDTO);
+        } else if(addressDTO instanceof CompanyAddressDTO) {
+            userAddress = new CompanyAddress((CompanyAddressDTO) addressDTO);
+        }
+
+        user.addAddress(userAddress);
+        userRepository.saveAndFlush(user);
     }
 }

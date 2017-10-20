@@ -124,6 +124,11 @@ public class ProductService {
             throw new InvalidProductDescriptionException("Invalid product description");
         }
 
+        Product alreadyExists = productRepository.findFirst1ByNameIgnoreCase(name);
+        if(alreadyExists != null) {
+            throw new ProductAlreadyExistsException("The given name is already taken");
+        }
+
         Product product = new Product(name, price, amount, description, categoryLogic);
         for(FeatureBagDTO featureBagDTO : features) {
             FeatureBag featureBag = new FeatureBag(featureBagDTO.getFeatureDefinition(), featureBagDTO.getFeatureValues());
@@ -163,6 +168,11 @@ public class ProductService {
         if(data.getName() != null) { // update name if present
             if(!validator.validateName()) {
                 throw new InvalidProductNameException("Invalid product name");
+            }
+
+            Product alreadyExists = productRepository.findFirst1ByNameIgnoreCase(data.getName());
+            if(alreadyExists != null) {
+                throw new ProductAlreadyExistsException("The given name is already taken");
             }
             product.setName(data.getName());
         }

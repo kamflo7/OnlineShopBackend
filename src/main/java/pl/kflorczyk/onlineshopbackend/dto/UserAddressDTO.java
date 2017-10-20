@@ -1,47 +1,18 @@
-package pl.kflorczyk.onlineshopbackend.model;
+package pl.kflorczyk.onlineshopbackend.dto;
 
-import pl.kflorczyk.onlineshopbackend.dto.UserAddressDTO;
-
-import javax.persistence.*;
-
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class UserAddress {
-    @Id
-    @GeneratedValue
-    private long ID;
-
-    private boolean isDefault;
-
+public abstract class UserAddressDTO {
     private String addressName;
     private String street, zipCode, city, phoneNumber;
     private int houseNumber;
 
-    public UserAddress() {}
-
-    public UserAddress(UserAddressDTO dto) {
-        this.addressName = dto.getAddressName();
-        this.street = dto.getStreet();
-        this.houseNumber = dto.getHouseNumber();
-        this.zipCode = dto.getZipCode();
-        this.city = dto.getCity();
-        this.phoneNumber = dto.getPhoneNumber();
+    public UserAddressDTO() {
     }
 
-    public UserAddress(boolean isDefault) {
-        this.isDefault = isDefault;
-    }
-
-    public long getID() {
-        return ID;
-    }
-
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
+    public UserAddressDTO(int houseNumber, String zipCode, String city, String phoneNumber) {
+        this.houseNumber = houseNumber;
+        this.zipCode = zipCode;
+        this.city = city;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getAddressName() {

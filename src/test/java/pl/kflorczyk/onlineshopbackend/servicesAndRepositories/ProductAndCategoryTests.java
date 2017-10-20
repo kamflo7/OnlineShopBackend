@@ -1,8 +1,6 @@
 package pl.kflorczyk.onlineshopbackend.servicesAndRepositories;
 
-import org.assertj.core.api.Java6Assertions;
 import org.assertj.core.util.Lists;
-import org.assertj.core.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,13 +22,11 @@ import pl.kflorczyk.onlineshopbackend.services.CategoryService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)

@@ -1,6 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,13 +15,9 @@ public class User {
 
     private String password;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
-    private List<UserAddress> addresses;
-
-//    @OneToMany
-//    @JoinColumn(name = "user_id")
-//    private List<Order> orders;
+    private List<UserAddress> addresses = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
@@ -55,6 +52,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void addAddress(UserAddress userAddress) {
+        addresses.add(userAddress);
+    }
+
+    public List<UserAddress> getAddresses() {
+        return addresses;
     }
 
     @Override

@@ -99,7 +99,8 @@ public class CategoryController {
                 IncompatibleFeatureDefinitionAssignmentException |
                 CategoryNotFoundException |
                 InvalidProductNameException |
-                InvalidProductDescriptionException e) {
+                InvalidProductDescriptionException |
+                ProductAlreadyExistsException e) {
             try {
                 return new ObjectMapper().writeValueAsString(new Response<>(Response.Status.FAILURE, e.getMessage()));
             } catch (JsonProcessingException e1) {
@@ -110,10 +111,10 @@ public class CategoryController {
         String result = null;
         try {
             result = new ObjectMapper()
-                    .writer(getJSONFilters(Claimant.MANY_PRODUCTS))
+                    .writer(getJSONFilters(Claimant.ONE_PRODUCT))
                     .writeValueAsString(new Response<>(product));
         } catch (JsonProcessingException e) {
-            return null;
+            e.printStackTrace();
         }
 
         return result;
@@ -133,7 +134,8 @@ public class CategoryController {
                 IncompatibleFeatureDefinitionAssignmentException |
                 CategoryNotFoundException |
                 InvalidProductNameException |
-                InvalidProductDescriptionException e) {
+                InvalidProductDescriptionException |
+                ProductAlreadyExistsException e) {
             try {
                 return new ObjectMapper().writeValueAsString(new Response<>(Response.Status.FAILURE, e.getMessage()));
             } catch (JsonProcessingException e1) {
