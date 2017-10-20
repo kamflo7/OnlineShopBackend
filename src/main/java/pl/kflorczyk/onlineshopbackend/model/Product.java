@@ -26,7 +26,6 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_logic_id")
-//    @JsonIgnore
     private CategoryLogic categoryLogic;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -34,15 +33,8 @@ public class Product {
     private List<FeatureBag> featureBags = new ArrayList<>();
 
     public void addFeature(FeatureBag featureBag) throws UnsupportedOperationException {
-//        if(featureBag.getFeatureDefinition().getCategoryLogic().getID() != this.categoryLogic.getID())
-//            throw new UnsupportedOperationException("This featureBag does not belong to this product category");
-
         this.featureBags.add(featureBag);
     }
-
-//    public void setFeatureBags(List<FeatureBag> featureBags) {
-//        this.featureBags = featureBags;
-//    }
 
     public Product() {}
 

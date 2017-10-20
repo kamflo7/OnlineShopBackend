@@ -28,6 +28,10 @@ public class ProductService {
         this.categoryLogicRepository = categoryLogicRepository;
     }
 
+    public Product getProduct(long productID) {
+        return productRepository.findOne(productID);
+    }
+
     public List<Product> getProducts(long categoryID) {
         return getProducts(categoryID, null);
     }

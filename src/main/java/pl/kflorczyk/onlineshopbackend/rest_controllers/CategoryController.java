@@ -29,6 +29,7 @@ public class CategoryController {
     @Autowired
     private ProductService productService;
 
+    // Category section
     @GetMapping(path = "/categories/{id}")
     public String getCategory(@PathVariable long id) {
         CategoryLogic categoryLogic = categoryService.getCategoryLogic(id);
@@ -67,6 +68,7 @@ public class CategoryController {
     }
 
 
+    // FeatureGroup section
     @PutMapping(path = "/categories/{categoryID}/feature_groups")
     public Response<CategoryLogic> createFeatureGroup(
             @PathVariable(name = "categoryID") long categoryID,
@@ -82,55 +84,7 @@ public class CategoryController {
         return new Response<>(categoryLogic);
     }
 
-    @PutMapping(path = "/categories/{categoryID}/feature_groups/{groupID}/feature_definitions")
-    public String createFeatureDefinition(
-            @PathVariable(name = "categoryID") long categoryID,
-            @PathVariable(name = "groupID") long groupID,
-            @RequestBody FeatureDefinitionDTO featureDTO
-    ) {
-        CategoryLogic categoryLogic = null;
-        String result = null;
-
-        try {
-            categoryLogic = categoryService.createFeatureDefinition(featureDTO, groupID, categoryID);
-        } catch(CategoryNotFoundException | FeatureDefinitionAlreadyExists | FeatureGroupNotFoundException | InvalidFeatureDefinitionNameException | InvalidFeatureValueDefinitionException e) {
-            try {
-                return new ObjectMapper().writeValueAsString(new Response<CategoryLogic>(Response.Status.FAILURE, e.getMessage()));
-            } catch (JsonProcessingException e1) {
-                return null;
-            }
-        }
-
-        try {
-            result = new ObjectMapper()
-                    .writer(getJSONFilters(Claimant.CATEGORY_LOGIC))
-                    .writeValueAsString(new Response<>(categoryLogic));
-        } catch (JsonProcessingException e) {
-            return null;
-        }
-        return result;
-    }
-
-    @GetMapping(path = "/categories/{categoryID}/products")
-    public String getProducts(
-            @PathVariable(name = "categoryID") long categoryID,
-            @RequestParam(name = "f", required = false) String filters
-    ) {
-        FilterParameters filterParameters = new FilterParameters(filters == null ? "" : filters);
-        List<Product> products = productService.getProducts(categoryID, filterParameters);
-
-        String result = null;
-        try {
-             result = new ObjectMapper()
-                    .writer(getJSONFilters(Claimant.PRODUCT))
-                    .writeValueAsString(new Response<>(products));
-        } catch (JsonProcessingException e) {
-            return null;
-        }
-
-        return result;
-    }
-
+    // Product section
     @PutMapping(path = "/categories/{categoryID}/products")
     public String createProduct(
         @PathVariable(name = "categoryID") long categoryID,
@@ -156,7 +110,7 @@ public class CategoryController {
         String result = null;
         try {
             result = new ObjectMapper()
-                    .writer(getJSONFilters(Claimant.PRODUCT))
+                    .writer(getJSONFilters(Claimant.MANY_PRODUCTS))
                     .writeValueAsString(new Response<>(product));
         } catch (JsonProcessingException e) {
             return null;
@@ -190,12 +144,82 @@ public class CategoryController {
         String result = null;
         try {
             result = new ObjectMapper()
-                    .writer(getJSONFilters(Claimant.PRODUCT))
+                    .writer(getJSONFilters(Claimant.MANY_PRODUCTS))
                     .writeValueAsString(new Response<>(product));
         } catch (JsonProcessingException e) {
             return null;
         }
 
+        return result;
+    }
+
+    @GetMapping(path = "/categories/{categoryID}/products")
+    public String getProducts(
+            @PathVariable(name = "categoryID") long categoryID,
+            @RequestParam(name = "f", required = false) String filters
+    ) {
+        FilterParameters filterParameters = new FilterParameters(filters == null ? "" : filters);
+        List<Product> products = productService.getProducts(categoryID, filterParameters);
+
+        String result = null;
+        try {
+            result = new ObjectMapper()
+                    .writer(getJSONFilters(Claimant.MANY_PRODUCTS))
+                    .writeValueAsString(new Response<>(products));
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+
+        return result;
+    }
+
+    @GetMapping(path = "/products/{productID}")
+    public String getProduct(@PathVariable(name = "productID") long productID) {
+        Product product = productService.getProduct(productID);
+
+        String result = null;
+        try {
+            Response response = product == null ? new Response<>(Response.Status.FAILURE, "Product not found")
+                                                : new Response<>(product);
+
+            result = new ObjectMapper()
+                    .writer(getJSONFilters(Claimant.ONE_PRODUCT))
+                    .writeValueAsString(product);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return result;
+    }
+
+    // FeatureDefinition section
+    @PutMapping(path = "/categories/{categoryID}/feature_groups/{groupID}/feature_definitions")
+    public String createFeatureDefinition(
+            @PathVariable(name = "categoryID") long categoryID,
+            @PathVariable(name = "groupID") long groupID,
+            @RequestBody FeatureDefinitionDTO featureDTO
+    ) {
+        CategoryLogic categoryLogic = null;
+        String result = null;
+
+        try {
+            categoryLogic = categoryService.createFeatureDefinition(featureDTO, groupID, categoryID);
+        } catch(CategoryNotFoundException | FeatureDefinitionAlreadyExists | FeatureGroupNotFoundException | InvalidFeatureDefinitionNameException | InvalidFeatureValueDefinitionException e) {
+            try {
+                return new ObjectMapper().writeValueAsString(new Response<CategoryLogic>(Response.Status.FAILURE, e.getMessage()));
+            } catch (JsonProcessingException e1) {
+                return null;
+            }
+        }
+
+        try {
+            result = new ObjectMapper()
+                    .writer(getJSONFilters(Claimant.CATEGORY_LOGIC))
+                    .writeValueAsString(new Response<>(categoryLogic));
+        } catch (JsonProcessingException e) {
+            return null;
+        }
         return result;
     }
 
@@ -236,13 +260,22 @@ public class CategoryController {
     }
 
     private FilterProvider getJSONFilters(Claimant claimant) {
-        if(claimant == Claimant.PRODUCT) {
+        if(claimant == Claimant.MANY_PRODUCTS) {
             return new SimpleFilterProvider()
-                    .addFilter("getProductsFilter_product",
-                            SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
+                    .addFilter("getProductsFilter_product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
                     .addFilter("getProductsFilter_featureDefinition",
-                            SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic", "featureGroup", "featureValueDefinitions",
+                            SimpleBeanPropertyFilter.serializeAllExcept(
+                                    "categoryLogic", "featureGroup", "featureValueDefinitions",
                                     "visible", "filterable", "multipleValues", "name"));
+        } else if(claimant == Claimant.ONE_PRODUCT) {
+            return new SimpleFilterProvider()
+                    .addFilter("getProductsFilter_product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
+                    .addFilter("FeatureBagFilter", SimpleBeanPropertyFilter.serializeAllExcept("id"))
+                    .addFilter("FeatureValueFilter", SimpleBeanPropertyFilter.serializeAllExcept("id"))
+                    .addFilter("getProductsFilter_featureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
+                            "id", "featureGroup", "categoryLogic", "featureValueDefinitions"
+                    ));
+
         } else if(claimant == Claimant.CATEGORY_LOGIC) {
             return new SimpleFilterProvider()
                     .addFilter("getProductsFilter_product", SimpleBeanPropertyFilter.serializeAll())
@@ -252,7 +285,8 @@ public class CategoryController {
     }
 
     private enum Claimant {
-        PRODUCT,
+        ONE_PRODUCT,
+        MANY_PRODUCTS,
         CATEGORY_LOGIC
     }
 }
