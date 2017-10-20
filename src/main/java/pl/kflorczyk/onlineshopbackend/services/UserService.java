@@ -16,6 +16,8 @@ import pl.kflorczyk.onlineshopbackend.validators.EmailValidator;
 import pl.kflorczyk.onlineshopbackend.validators.PasswordValidator;
 import pl.kflorczyk.onlineshopbackend.validators.UserAddressValidator;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -102,6 +104,37 @@ public class UserService {
             userAddress = new CompanyAddress((CompanyAddressDTO) addressDTO);
         }
 
+        user.addAddress(userAddress);
+        userRepository.saveAndFlush(user);
+    }
+
+    public void editUserAddress(long userID, long addressID, UserAddressDTO addressDTO) {
+        if(addressDTO == null) {
+            throw new NullPointerException("UserAddressDTO is null");
+        }
+
+        if(!new UserAddressValidator(addressDTO).validate()) {
+            throw new InvalidAddressException("Invalid address");
+        }
+
+        User user = getUser(userID);
+        if(user == null) {
+            throw new UserNotFoundException("User not found for given id");
+        }
+
+        Optional<UserAddress> persistingAddress = user.getAddresses().stream().filter(a -> a.getID() == addressID).findAny();
+        if(!persistingAddress.isPresent()) {
+            throw new UserAddressNotFoundException("UserAddress not found for given ID");
+        }
+
+        UserAddress userAddress = null;
+        if(addressDTO instanceof PersonAddressDTO) {
+            userAddress = new PersonAddress((PersonAddressDTO) addressDTO);
+        } else if(addressDTO instanceof CompanyAddressDTO) {
+            userAddress = new CompanyAddress((CompanyAddressDTO) addressDTO);
+        }
+
+        user.removeAddress(persistingAddress.get());
         user.addAddress(userAddress);
         userRepository.saveAndFlush(user);
     }

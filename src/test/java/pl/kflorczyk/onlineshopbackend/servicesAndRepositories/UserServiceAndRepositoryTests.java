@@ -12,6 +12,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import pl.kflorczyk.onlineshopbackend.dto.CompanyAddressDTO;
 import pl.kflorczyk.onlineshopbackend.dto.PersonAddressDTO;
 import pl.kflorczyk.onlineshopbackend.dto.UserAddressDTO;
+import pl.kflorczyk.onlineshopbackend.model.CompanyAddress;
+import pl.kflorczyk.onlineshopbackend.model.PersonAddress;
 import pl.kflorczyk.onlineshopbackend.model.User;
 import pl.kflorczyk.onlineshopbackend.model.UserAddress;
 import pl.kflorczyk.onlineshopbackend.repositories.UserRepository;
@@ -66,5 +68,27 @@ public class UserServiceAndRepositoryTests {
 
         List<UserAddress> addresses = user.getAddresses();
         assertThat(addresses.size()).isEqualTo(2);
+    }
+
+    @Test
+    public void editAddressTest() {
+        User user = userService.registerUser("john.doe@gmail.com", "123456#^47");
+
+        PersonAddressDTO personDTO = new PersonAddressDTO(122, "32-061", "London", "500100200", "John", "Doe");
+        userService.createUserAddress(user.getID(), personDTO);
+
+        UserAddress justPersisted = user.getAddresses().get(0);
+
+        CompanyAddressDTO edit = new CompanyAddressDTO(244, "64-122", "Vandenberg", "333666999", "Something LTD", "1234567891");
+        userService.editUserAddress(user.getID(), justPersisted.getID(), edit);
+
+        CompanyAddress edited = (CompanyAddress) user.getAddresses().get(0);
+
+        assertThat(user.getAddresses().size()).isEqualTo(1);
+        assertThat(edited.getHouseNumber()).isEqualTo(edit.getHouseNumber());
+        assertThat(edited.getZipCode()).isEqualTo(edit.getZipCode());
+        assertThat(edited.getCity()).isEqualTo(edit.getCity());
+        assertThat(edited.getPhoneNumber()).isEqualTo(edit.getPhoneNumber());
+        assertThat(edited.getID()).isGreaterThan(justPersisted.getID());
     }
 }

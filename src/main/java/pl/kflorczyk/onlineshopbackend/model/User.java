@@ -30,6 +30,14 @@ public class User {
         this.password = password;
     }
 
+    public void addAddress(UserAddress userAddress) {
+        addresses.add(userAddress);
+    }
+
+    public void removeAddress(UserAddress userAddress) {
+        addresses.remove(userAddress);
+    }
+
     public long getID() {
         return ID;
     }
@@ -52,10 +60,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void addAddress(UserAddress userAddress) {
-        addresses.add(userAddress);
     }
 
     public List<UserAddress> getAddresses() {

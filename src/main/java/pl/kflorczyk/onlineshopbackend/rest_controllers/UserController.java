@@ -1,18 +1,20 @@
 package pl.kflorczyk.onlineshopbackend.rest_controllers;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import pl.kflorczyk.onlineshopbackend.dto.CompanyAddressDTO;
+import pl.kflorczyk.onlineshopbackend.dto.PersonAddressDTO;
+import pl.kflorczyk.onlineshopbackend.dto.UserAddressDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.User;
+import pl.kflorczyk.onlineshopbackend.model.UserAddress;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.Response;
+import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.ResponseDetail;
 import pl.kflorczyk.onlineshopbackend.services.JwtService;
 import pl.kflorczyk.onlineshopbackend.services.UserService;
-import pl.kflorczyk.onlineshopbackend.validators.EmailValidator;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 @RestController
 public class UserController {
@@ -21,37 +23,73 @@ public class UserController {
     @Autowired private JwtService jwtService;
 
     @PostMapping("/register")
-    public Response<User> register(
+    public Response register(
             @RequestParam(value = "email") String email,
             @RequestParam(value = "password") String password,
             HttpServletResponse response) {
         try {
             User user = userService.registerUser(email, password);
             response.setHeader("Token", jwtService.tokenFor(user));
-        } catch(InvalidEmailException e) {
-            return new Response<>(Response.Status.FAILURE, e.getMessage());
-        } catch(EmailAlreadyExistsException e) {
-            return new Response<>(Response.Status.FAILURE, e.getMessage());
-        } catch(InvalidPasswordException e) {
-            return new Response<>(Response.Status.FAILURE, e.getMessage());
+        } catch(InvalidEmailException |
+                EmailAlreadyExistsException |
+                InvalidPasswordException e) {
+            return new Response(ResponseDetail.Status.FAILURE, e.getMessage());
         }
 
-        return new Response<>(Response.Status.SUCCESS);
+        return new Response(ResponseDetail.Status.SUCCESS);
     }
 
     @PostMapping(path = "/login")
-    public Response<User> login(@RequestParam(value = "email") String email,
-                        @RequestParam(value = "password") String password,
-                        HttpServletResponse response) {
+    public Response login(@RequestParam(value = "email") String email,
+                                      @RequestParam(value = "password") String password,
+                                      HttpServletResponse response) {
         try {
             User user = userService.loginUser(email, password);
             response.setHeader("Token", jwtService.tokenFor(user));
-        } catch (UserNotFoundException e) {
-            return new Response<>(Response.Status.FAILURE, e.getMessage());
-        } catch (PasswordNotMatchException e) {
-            return new Response<>(Response.Status.FAILURE, e.getMessage());
+        } catch (UserNotFoundException |
+                PasswordNotMatchException e) {
+            return new Response(Response.Status.FAILURE, e.getMessage());
         }
 
-        return new Response<>(Response.Status.SUCCESS);
+        return new Response(Response.Status.SUCCESS);
     }
+
+    @PutMapping(path = "/users/{userID}/addresses/person")
+    public Response createAddress(@PathVariable(name = "userID") long userID, @RequestBody PersonAddressDTO dto) {
+        return createAddress(userID, dto);
+    }
+
+    @PutMapping(path = "/users/{userID}/addresses/company")
+    public Response createAddress(@PathVariable(name = "userID") long userID, @RequestBody CompanyAddressDTO dto) {
+        return createAddress(userID, dto);
+    }
+
+    @PostMapping(path = "/users/{userID}/addresses/{addressID}/person")
+    public Response editAddress(@PathVariable(name = "userID") long userID, @PathVariable(name = "addressID") long addressID, @RequestBody PersonAddressDTO dto) {
+        return editAddress(userID, addressID, dto);
+    }
+
+    @PostMapping(path = "/users/{userID}/addresses/{addressID}company")
+    public Response editAddress(@PathVariable(name = "userID") long userID, @PathVariable(name = "addressID") long addressID, @RequestBody CompanyAddressDTO dto) {
+        return editAddress(userID, addressID, dto);
+    }
+
+    private Response createAddress(long userID, UserAddressDTO dto) {
+        try {
+            userService.createUserAddress(userID, dto);
+        } catch(NullPointerException | InvalidAddressException | UserNotFoundException e) {
+            return new Response(Response.Status.FAILURE, e.getMessage());
+        }
+        return new Response(Response.Status.SUCCESS);
+    }
+
+    private Response editAddress(long userID, long addressID, UserAddressDTO dto) {
+        try {
+            userService.editUserAddress(userID, addressID, dto);
+        } catch(NullPointerException | InvalidAddressException | UserNotFoundException | UserAddressNotFoundException e) {
+            return new Response(Response.Status.FAILURE, e.getMessage());
+        }
+        return new Response(Response.Status.SUCCESS);
+    }
+
 }

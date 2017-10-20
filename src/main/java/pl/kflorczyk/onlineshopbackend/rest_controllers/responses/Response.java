@@ -1,6 +1,6 @@
 package pl.kflorczyk.onlineshopbackend.rest_controllers.responses;
 
-public class Response<T> {
+public class Response {
     private static final String STATUS_SUCCESS = "success";
     private static final String STATUS_FAILURE = "failure";
 
@@ -10,7 +10,6 @@ public class Response<T> {
     }
 
     private String status, description;
-    private T data = null;
 
     public Response(Status status) {
         if(status == Status.SUCCESS)
@@ -24,20 +23,11 @@ public class Response<T> {
         this.description = description;
     }
 
-    public Response(T data) {
-        this.status = STATUS_SUCCESS;
-        this.data = data;
-    }
-
     public String getStatus() {
         return status;
     }
 
     public String getDescription() {
         return description;
-    }
-
-    public T getData() {
-        return data;
     }
 }

@@ -15,6 +15,7 @@ import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
 import pl.kflorczyk.onlineshopbackend.model.Product;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.Response;
+import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.ResponseDetail;
 import pl.kflorczyk.onlineshopbackend.services.CategoryService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
@@ -36,7 +37,7 @@ public class CategoryController {
 
         if(categoryLogic == null) {
             try {
-                return new ObjectMapper().writeValueAsString(new Response<CategoryLogic>(Response.Status.FAILURE, "CategoryLogic not found for given ID"));
+                return new ObjectMapper().writeValueAsString(new ResponseDetail<CategoryLogic>(ResponseDetail.Status.FAILURE, "CategoryLogic not found for given ID"));
             } catch (JsonProcessingException e) {
                 return null;
             }
@@ -46,7 +47,7 @@ public class CategoryController {
         try {
             result = new ObjectMapper()
                     .writer(getJSONFilters(Claimant.CATEGORY_LOGIC))
-                    .writeValueAsString(new Response<>(categoryLogic));
+                    .writeValueAsString(new ResponseDetail<>(categoryLogic));
         } catch (JsonProcessingException e) {
             return null;
         }
@@ -55,22 +56,22 @@ public class CategoryController {
     }
 
     @PutMapping(path = "/categories")
-    public Response<CategoryLogic> createCategory(@RequestParam(name = "name") String name) {
+    public ResponseDetail<CategoryLogic> createCategory(@RequestParam(name = "name") String name) {
         CategoryLogic categoryLogic = null;
 
         try {
             categoryLogic = categoryService.createNewCategory(name);
         } catch(InvalidCategoryNameException | CategoryAlreadyExistsException e) {
-            return new Response<>(Response.Status.FAILURE, e.getMessage());
+            return new ResponseDetail<>(ResponseDetail.Status.FAILURE, e.getMessage());
         }
 
-        return new Response<>(categoryLogic);
+        return new ResponseDetail<>(categoryLogic);
     }
 
 
     // FeatureGroup section
     @PutMapping(path = "/categories/{categoryID}/feature_groups")
-    public Response<CategoryLogic> createFeatureGroup(
+    public ResponseDetail<CategoryLogic> createFeatureGroup(
             @PathVariable(name = "categoryID") long categoryID,
             @RequestParam(name = "name") String name) {
         CategoryLogic categoryLogic = null;
@@ -78,10 +79,10 @@ public class CategoryController {
         try {
             categoryLogic = categoryService.createFeatureGroup(name, categoryID);
         } catch(CategoryNotFoundException | InvalidFeatureGroupNameException e) {
-            return new Response<>(Response.Status.FAILURE, e.getMessage());
+            return new ResponseDetail<>(ResponseDetail.Status.FAILURE, e.getMessage());
         }
 
-        return new Response<>(categoryLogic);
+        return new ResponseDetail<>(categoryLogic);
     }
 
     // Product section
@@ -102,7 +103,7 @@ public class CategoryController {
                 InvalidProductDescriptionException |
                 ProductAlreadyExistsException e) {
             try {
-                return new ObjectMapper().writeValueAsString(new Response<>(Response.Status.FAILURE, e.getMessage()));
+                return new ObjectMapper().writeValueAsString(new ResponseDetail<>(ResponseDetail.Status.FAILURE, e.getMessage()));
             } catch (JsonProcessingException e1) {
                 return null;
             }
@@ -112,7 +113,7 @@ public class CategoryController {
         try {
             result = new ObjectMapper()
                     .writer(getJSONFilters(Claimant.ONE_PRODUCT))
-                    .writeValueAsString(new Response<>(product));
+                    .writeValueAsString(new ResponseDetail<>(product));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -137,7 +138,7 @@ public class CategoryController {
                 InvalidProductDescriptionException |
                 ProductAlreadyExistsException e) {
             try {
-                return new ObjectMapper().writeValueAsString(new Response<>(Response.Status.FAILURE, e.getMessage()));
+                return new ObjectMapper().writeValueAsString(new ResponseDetail<>(ResponseDetail.Status.FAILURE, e.getMessage()));
             } catch (JsonProcessingException e1) {
                 return null;
             }
@@ -147,7 +148,7 @@ public class CategoryController {
         try {
             result = new ObjectMapper()
                     .writer(getJSONFilters(Claimant.MANY_PRODUCTS))
-                    .writeValueAsString(new Response<>(product));
+                    .writeValueAsString(new ResponseDetail<>(product));
         } catch (JsonProcessingException e) {
             return null;
         }
@@ -167,7 +168,7 @@ public class CategoryController {
         try {
             result = new ObjectMapper()
                     .writer(getJSONFilters(Claimant.MANY_PRODUCTS))
-                    .writeValueAsString(new Response<>(products));
+                    .writeValueAsString(new ResponseDetail<>(products));
         } catch (JsonProcessingException e) {
             return null;
         }
@@ -181,8 +182,8 @@ public class CategoryController {
 
         String result = null;
         try {
-            Response response = product == null ? new Response<>(Response.Status.FAILURE, "Product not found")
-                                                : new Response<>(product);
+            ResponseDetail responseDetail = product == null ? new ResponseDetail<>(Response.Status.FAILURE, "Product not found")
+                                                : new ResponseDetail<>(product);
 
             result = new ObjectMapper()
                     .writer(getJSONFilters(Claimant.ONE_PRODUCT))
@@ -209,7 +210,7 @@ public class CategoryController {
             categoryLogic = categoryService.createFeatureDefinition(featureDTO, groupID, categoryID);
         } catch(CategoryNotFoundException | FeatureDefinitionAlreadyExists | FeatureGroupNotFoundException | InvalidFeatureDefinitionNameException | InvalidFeatureValueDefinitionException e) {
             try {
-                return new ObjectMapper().writeValueAsString(new Response<CategoryLogic>(Response.Status.FAILURE, e.getMessage()));
+                return new ObjectMapper().writeValueAsString(new ResponseDetail<CategoryLogic>(ResponseDetail.Status.FAILURE, e.getMessage()));
             } catch (JsonProcessingException e1) {
                 return null;
             }
@@ -218,7 +219,7 @@ public class CategoryController {
         try {
             result = new ObjectMapper()
                     .writer(getJSONFilters(Claimant.CATEGORY_LOGIC))
-                    .writeValueAsString(new Response<>(categoryLogic));
+                    .writeValueAsString(new ResponseDetail<>(categoryLogic));
         } catch (JsonProcessingException e) {
             return null;
         }
@@ -244,7 +245,7 @@ public class CategoryController {
                 FeatureGroupNotFoundException |
                 FeatureDefinitionCriticalOperationNotAuthorizedException e) {
             try {
-                return new ObjectMapper().writeValueAsString(new Response<CategoryLogic>(Response.Status.FAILURE, e.getMessage()));
+                return new ObjectMapper().writeValueAsString(new ResponseDetail<CategoryLogic>(ResponseDetail.Status.FAILURE, e.getMessage()));
             } catch (JsonProcessingException e1) {
                 return null;
             }
@@ -253,7 +254,7 @@ public class CategoryController {
         try {
             result = new ObjectMapper()
                     .writer(getJSONFilters(Claimant.CATEGORY_LOGIC))
-                    .writeValueAsString(new Response<>(categoryLogicRefreshed));
+                    .writeValueAsString(new ResponseDetail<>(categoryLogicRefreshed));
         } catch (JsonProcessingException e) {
             return null;
         }
