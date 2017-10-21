@@ -187,7 +187,7 @@ public class CategoryController {
 
             result = new ObjectMapper()
                     .writer(getJSONFilters(Claimant.ONE_PRODUCT))
-                    .writeValueAsString(product);
+                    .writeValueAsString(responseDetail);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;
