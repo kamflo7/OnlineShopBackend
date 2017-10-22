@@ -31,9 +31,9 @@ public class Product {
     @JoinColumn(name = "product_id")
     private List<FeatureBag> featureBags = new ArrayList<>();
 
-    @OneToOne
-    @JoinColumn(name = "image_id")
-    private Image image;
+//    @OneToOne
+//    @JoinColumn(name = "image_id")
+//    private Image image;
 
     public void addFeature(FeatureBag featureBag) throws UnsupportedOperationException {
         this.featureBags.add(featureBag);

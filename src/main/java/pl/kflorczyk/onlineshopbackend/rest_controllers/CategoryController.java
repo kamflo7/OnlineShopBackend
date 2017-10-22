@@ -49,6 +49,7 @@ public class CategoryController {
                     .writer(getJSONFilters(Claimant.CATEGORY_LOGIC))
                     .writeValueAsString(new ResponseDetail<>(categoryLogic));
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
             return null;
         }
 
@@ -119,6 +120,14 @@ public class CategoryController {
         }
 
         return result;
+    }
+
+    @PostMapping(path = "/products/test/{productID}")
+    public String editProductTEST(
+            @PathVariable(name = "productID") long productID,
+            @RequestBody ProductDTO productDTO
+    ) {
+        return null;
     }
 
     @PostMapping(path = "/products/{productID}")
@@ -269,16 +278,25 @@ public class CategoryController {
                                     "categoryLogic", "featureGroup", "featureValueDefinitions",
                                     "visible", "filterable", "multipleValues", "name"));
         } else if(claimant == Claimant.ONE_PRODUCT) {
+//            return new SimpleFilterProvider()
+//                    .addFilter("Product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
+//                    .addFilter("FeatureBag", SimpleBeanPropertyFilter.serializeAllExcept("id"))
+//                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAllExcept("id"))
+//                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
+//                            "id", "featureGroup", "categoryLogic", "featureValueDefinitions"
+//                    ));
             return new SimpleFilterProvider()
                     .addFilter("Product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
                     .addFilter("FeatureBag", SimpleBeanPropertyFilter.serializeAllExcept("id"))
-                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAllExcept("id"))
+                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
                             "id", "featureGroup", "categoryLogic", "featureValueDefinitions"
                     ));
         } else if(claimant == Claimant.CATEGORY_LOGIC) {
             return new SimpleFilterProvider()
                     .addFilter("Product", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAll());
         }
         return null;

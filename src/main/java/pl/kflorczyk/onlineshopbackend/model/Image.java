@@ -17,6 +17,7 @@ public class Image {
 
     private String contentType = null;
 
+
     public Image(byte[] bytes, String contentType) {
         this.bytes = bytes;
         this.contentType = contentType;

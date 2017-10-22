@@ -1,5 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.dto;
 
+import pl.kflorczyk.onlineshopbackend.model.Image;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,16 @@ public class ProductDTO {
     private Integer amount;
 
     private Map<Long, List<Long>> features;
+
+    // test
+    private String image;
+    public String getImage() {
+        return image;
+    }
+    public void setImage(String image) {
+        this.image = image;
+    }
+    // end test
 
     public ProductDTO() { }
 
