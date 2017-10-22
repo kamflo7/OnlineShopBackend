@@ -287,15 +287,14 @@ public class CategoryController {
 //                    ));
             return new SimpleFilterProvider()
                     .addFilter("Product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
-                    .addFilter("FeatureBag", SimpleBeanPropertyFilter.serializeAllExcept("id"))
+                    .addFilter("FeatureBag", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
-                            "id", "featureGroup", "categoryLogic", "featureValueDefinitions"
+                            "featureGroup", "categoryLogic", "featureValueDefinitions"
                     ));
         } else if(claimant == Claimant.CATEGORY_LOGIC) {
             return new SimpleFilterProvider()
                     .addFilter("Product", SimpleBeanPropertyFilter.serializeAll())
-                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAll());
         }
