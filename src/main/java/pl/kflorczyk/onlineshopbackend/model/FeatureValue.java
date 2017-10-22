@@ -3,8 +3,6 @@ package pl.kflorczyk.onlineshopbackend.model;
 import com.fasterxml.jackson.annotation.JsonFilter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @JsonFilter("FeatureValue")

@@ -11,9 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.kflorczyk.onlineshopbackend.dto.CompanyAddressDTO;
 import pl.kflorczyk.onlineshopbackend.dto.PersonAddressDTO;
-import pl.kflorczyk.onlineshopbackend.dto.UserAddressDTO;
 import pl.kflorczyk.onlineshopbackend.model.CompanyAddress;
-import pl.kflorczyk.onlineshopbackend.model.PersonAddress;
 import pl.kflorczyk.onlineshopbackend.model.User;
 import pl.kflorczyk.onlineshopbackend.model.UserAddress;
 import pl.kflorczyk.onlineshopbackend.repositories.UserRepository;
@@ -22,7 +20,6 @@ import pl.kflorczyk.onlineshopbackend.services.UserService;
 import java.util.List;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 
 @RunWith(SpringRunner.class)

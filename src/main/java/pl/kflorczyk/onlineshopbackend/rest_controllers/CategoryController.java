@@ -121,16 +121,15 @@ public class CategoryController {
         return result;
     }
 
-    @PostMapping(path = "/categories/{categoryID}/products/{productID}")
+    @PostMapping(path = "/products/{productID}")
     public String editProduct(
-            @PathVariable(name = "categoryID") long categoryID,
             @PathVariable(name = "productID") long productID,
             @RequestBody ProductDTO productDTO
     ) {
         Product product = null;
 
         try {
-            product = productService.editProduct(categoryID, productDTO);
+            product = productService.editProduct(productID, productDTO);
         } catch(IncompatibleFeatureValueDefinitionAssignmentException |
                 IncompatibleFeatureDefinitionAssignmentException |
                 CategoryNotFoundException |
@@ -147,10 +146,10 @@ public class CategoryController {
         String result = null;
         try {
             result = new ObjectMapper()
-                    .writer(getJSONFilters(Claimant.MANY_PRODUCTS))
+                    .writer(getJSONFilters(Claimant.ONE_PRODUCT))
                     .writeValueAsString(new ResponseDetail<>(product));
         } catch (JsonProcessingException e) {
-            return null;
+            e.printStackTrace();
         }
 
         return result;

@@ -7,14 +7,12 @@ import pl.kflorczyk.onlineshopbackend.dto.PersonAddressDTO;
 import pl.kflorczyk.onlineshopbackend.dto.UserAddressDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.User;
-import pl.kflorczyk.onlineshopbackend.model.UserAddress;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.Response;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.ResponseDetail;
 import pl.kflorczyk.onlineshopbackend.services.JwtService;
 import pl.kflorczyk.onlineshopbackend.services.UserService;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 
 @RestController
 public class UserController {

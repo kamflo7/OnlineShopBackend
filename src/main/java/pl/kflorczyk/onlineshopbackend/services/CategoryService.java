@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTOEditable;
-import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
@@ -14,8 +13,6 @@ import pl.kflorczyk.onlineshopbackend.validators.FeatureDefinitionValidator;
 import pl.kflorczyk.onlineshopbackend.validators.FeatureGroupValidator;
 import pl.kflorczyk.onlineshopbackend.validators.SimpleNameValidator;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

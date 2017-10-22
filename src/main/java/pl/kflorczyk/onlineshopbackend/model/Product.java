@@ -1,7 +1,6 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -31,6 +30,10 @@ public class Product {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
     private List<FeatureBag> featureBags = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "image_id")
+    private Image image;
 
     public void addFeature(FeatureBag featureBag) throws UnsupportedOperationException {
         this.featureBags.add(featureBag);
