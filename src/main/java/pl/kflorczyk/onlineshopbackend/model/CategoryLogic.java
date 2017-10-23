@@ -1,5 +1,6 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@JsonFilter("CategoryLogic")
 public class CategoryLogic {
 
     @Id

@@ -286,7 +286,8 @@ public class CategoryController {
 //                            "id", "featureGroup", "categoryLogic", "featureValueDefinitions"
 //                    ));
             return new SimpleFilterProvider()
-                    .addFilter("Product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
+                    .addFilter("Product", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("CategoryLogic", SimpleBeanPropertyFilter.filterOutAllExcept("id"))
                     .addFilter("FeatureBag", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
@@ -296,7 +297,8 @@ public class CategoryController {
             return new SimpleFilterProvider()
                     .addFilter("Product", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll())
-                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAll());
+                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("CategoryLogic", SimpleBeanPropertyFilter.serializeAll());
         }
         return null;
     }
