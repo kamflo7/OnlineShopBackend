@@ -130,6 +130,20 @@ public class CategoryController {
         return new ResponseDetail<>(categoryLogic);
     }
 
+    @PostMapping(path = "/categories/{categoryID}/feature_groups/{groupID}")
+    public String editFeatureGroup(
+            @PathVariable(name = "categoryID") long categoryID,
+            @PathVariable(name = "groupID") long groupID,
+            @RequestParam(name = "name") String name
+    ) {
+        CategoryLogic edited = null;
+        try {
+            edited = categoryService.editFeatureGroup(categoryID, groupID, name);
+        } catch(InvalidFeatureGroupNameException | CategoryNotFoundException | FeatureGroupNotFoundException e) {
+            return mapToJSON(Claimant.CATEGORY_LOGIC, new ResponseDetail<>(e.getMessage()));
+        }
+        return mapToJSON(Claimant.CATEGORY_LOGIC, new ResponseDetail<>(edited));
+    }
     // Product section
     @PutMapping(path = "/categories/{categoryID}/products")
     public String createProduct(

@@ -142,7 +142,7 @@ public class CategoryService {
         return categoryLogic;
     }
 
-    public void editFeatureGroup(long categoryID, long featureGroupID, String newName) {
+    public CategoryLogic editFeatureGroup(long categoryID, long featureGroupID, String newName) {
         if(!new FeatureGroupValidator().validate(newName)) {
             throw new InvalidFeatureGroupNameException("Invalid name");
         }
@@ -159,6 +159,7 @@ public class CategoryService {
 
         featureGroup.get().setName(newName);
         categoryLogicRepository.saveAndFlush(categoryLogic);
+        return categoryLogic;
     }
 
     public CategoryLogic editFeatureDefinition(long categoryID, long featureGroupID, long featureDefinitionID, FeatureDefinitionDTOEditable newFeatureDefinition) {

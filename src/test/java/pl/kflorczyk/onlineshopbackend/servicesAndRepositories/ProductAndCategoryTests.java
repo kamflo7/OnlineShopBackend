@@ -168,6 +168,23 @@ public class ProductAndCategoryTests {
     }
 
     @Test
+    public void editFeatureGroup() {
+        CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
+
+        categoryService.createFeatureGroup("Informacje techniczne", smartfony.getID());
+        FeatureGroup obtained = categoryService.getCategoriesLogic().get(0).getFeatureGroups().get(0);
+
+        CategoryLogic updatedCategory = null;
+        try {
+            updatedCategory = categoryService.editFeatureGroup(smartfony.getID(), obtained.getId(), "Informacje bardzo techniczne");
+        } catch(InvalidFeatureGroupNameException | CategoryNotFoundException | FeatureGroupNotFoundException e) {
+            fail("Should not appear this");
+        }
+
+        assertThat(updatedCategory.getFeatureGroups().get(0).getName()).isEqualTo("Informacje bardzo techniczne");
+    }
+
+    @Test
     public void createFeatureDefinitionWithItsValues() {
         CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
         categoryService.createFeatureGroup("Informacje techniczne", smartfony);
