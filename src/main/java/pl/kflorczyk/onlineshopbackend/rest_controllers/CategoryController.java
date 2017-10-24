@@ -31,6 +31,23 @@ public class CategoryController {
     private ProductService productService;
 
     // Category section
+    @GetMapping(path = "/categories")
+    public String getCategories() {
+        List<CategoryLogic> categories = categoryService.getCategoriesLogic();
+
+        String result = null;
+        try {
+            result = new ObjectMapper()
+                    .writer(getJSONFilters(Claimant.MANY_CATEGORIES_LOGIC))
+                    .writeValueAsString(new ResponseDetail<>(categories));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return result;
+    }
+
     @GetMapping(path = "/categories/{id}")
     public String getCategory(@PathVariable long id) {
         CategoryLogic categoryLogic = categoryService.getCategoryLogic(id);
@@ -57,18 +74,45 @@ public class CategoryController {
     }
 
     @PutMapping(path = "/categories")
-    public ResponseDetail<CategoryLogic> createCategory(@RequestParam(name = "name") String name) {
+    public String createCategory(@RequestParam(name = "name") String name) {
         CategoryLogic categoryLogic = null;
 
         try {
             categoryLogic = categoryService.createNewCategory(name);
         } catch(InvalidCategoryNameException | CategoryAlreadyExistsException e) {
-            return new ResponseDetail<>(ResponseDetail.Status.FAILURE, e.getMessage());
+            try {
+                return new ObjectMapper()
+                        .writer(getJSONFilters(Claimant.CATEGORY_LOGIC))
+                        .writeValueAsString(new ResponseDetail<>(e.getMessage()));
+            } catch (JsonProcessingException e1) {
+                e1.printStackTrace();
+                return null;
+            }
         }
 
-        return new ResponseDetail<>(categoryLogic);
+        String result = null;
+        try {
+            result = new ObjectMapper()
+                    .writer(getJSONFilters(Claimant.CATEGORY_LOGIC))
+                    .writeValueAsString(new ResponseDetail<>(categoryLogic));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return result;
     }
 
+    @PostMapping(path = "/categories/{id}")
+    public String editCategory(@PathVariable long id, @RequestParam(name = "name") String name) {
+        CategoryLogic edited = null;
+        try {
+            edited = categoryService.editCategoryLogic(id, name);
+        } catch(InvalidCategoryNameException | CategoryNotFoundException e) {
+            return mapToJSON(Claimant.CATEGORY_LOGIC, new ResponseDetail<>(e.getMessage()));
+        }
+        return mapToJSON(Claimant.CATEGORY_LOGIC, new ResponseDetail<>(edited));
+    }
 
     // FeatureGroup section
     @PutMapping(path = "/categories/{categoryID}/feature_groups")
@@ -299,6 +343,14 @@ public class CategoryController {
                     .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("CategoryLogic", SimpleBeanPropertyFilter.serializeAll());
+        } else if(claimant == Claimant.MANY_CATEGORIES_LOGIC) {
+            return new SimpleFilterProvider()
+                    .addFilter("Product", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("CategoryLogic", SimpleBeanPropertyFilter.serializeAllExcept(
+                            "featureDefinitions", "featureGroups"
+                    ));
         }
         return null;
     }
@@ -306,6 +358,20 @@ public class CategoryController {
     private enum Claimant {
         ONE_PRODUCT,
         MANY_PRODUCTS,
-        CATEGORY_LOGIC
+        CATEGORY_LOGIC,
+        MANY_CATEGORIES_LOGIC
+    }
+
+    private String mapToJSON(Claimant claimant, Object valueToMap) {
+        String result = null;
+        try {
+            result = new ObjectMapper()
+                    .writer(getJSONFilters(claimant))
+                    .writeValueAsString(valueToMap);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return "{\"status\": \"failure\", \"description\": \"internal error\"}";
+        }
+        return result;
     }
 }

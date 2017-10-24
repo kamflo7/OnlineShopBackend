@@ -10,9 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureBagDTO;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
 import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
-import pl.kflorczyk.onlineshopbackend.exceptions.CategoryAlreadyExistsException;
-import pl.kflorczyk.onlineshopbackend.exceptions.FeatureDefinitionAlreadyExists;
-import pl.kflorczyk.onlineshopbackend.exceptions.InvalidFeatureValueDefinitionException;
+import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
@@ -144,6 +142,19 @@ public class ProductAndCategoryTests {
 
         assertThat(exceptions).isEqualTo(2);
         assertThat(smartfony).isNotNull();
+    }
+
+    @Test
+    public void editCategoryName() {
+        CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
+        CategoryLogic edited = null;
+        try {
+            edited = categoryService.editCategoryLogic(smartfony.getID(), "Inne smartfony");
+        } catch(InvalidCategoryNameException | CategoryNotFoundException e) {
+            fail("Should not appear this");
+        }
+
+        assertThat(edited.getName()).isEqualTo("Inne smartfony");
     }
 
     @Test
