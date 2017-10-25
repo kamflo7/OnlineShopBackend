@@ -94,7 +94,7 @@ public class CategoryService {
         }
 
         SimpleNameValidator validator = new SimpleNameValidator(3);
-        featureDefinitionDTO.getValues().stream().forEach( f -> {
+        featureDefinitionDTO.getNewValues().stream().forEach(f -> {
             if(!validator.validate(f)) {
                 throw new InvalidFeatureValueDefinitionException("Invalid value for FeatureValue");
             }
@@ -103,8 +103,8 @@ public class CategoryService {
         FeatureDefinition featureDefinition = new FeatureDefinition(featureDefinitionDTO.getName(), featureGroup, featureDefinitionDTO.isFilterable(), featureDefinitionDTO.isMultipleValues(), featureDefinitionDTO.isVisible());
         categoryLogic.addFeatureDefinition(featureDefinition);
 
-        List<FeatureValue> featureValues = new ArrayList<>(featureDefinitionDTO.getValues().size());
-        featureDefinitionDTO.getValues().stream().forEach(f -> featureValues.add(new FeatureValue(f)));
+        List<FeatureValue> featureValues = new ArrayList<>(featureDefinitionDTO.getNewValues().size());
+        featureDefinitionDTO.getNewValues().stream().forEach(f -> featureValues.add(new FeatureValue(f)));
 
         featureDefinition.setFeatureValueDefinitions(featureValues);
         categoryLogicRepository.saveAndFlush(categoryLogic);
@@ -178,12 +178,21 @@ public class CategoryService {
             });
         }
 
+        List<String> additionalNewValues = newFeatureDefinition.getNewValues();
+        if(additionalNewValues != null) {
+            additionalNewValues.forEach(v -> {
+                if (!validator.validate(v)) {
+                    throw new InvalidFeatureValueDefinitionException("Invalid value for FeatureValue");
+                }
+            });
+        }
+
         CategoryLogic categoryLogic = categoryLogicRepository.findOne(categoryID);
         if(categoryLogic == null) {
             throw new CategoryNotFoundException("Category not found for given ID");
         }
 
-        if(categoryLogic.getFeatureDefinitions().stream().filter(f -> f.getName().equals(newFeatureDefinition.getName())).findAny().isPresent()) {
+        if(categoryLogic.getFeatureDefinitions().stream().filter(f ->  f.getName().equals(newFeatureDefinition.getName()) && f.getId() != featureDefinitionID).findAny().isPresent()) {
             throw new FeatureDefinitionAlreadyExists("The given name for FeatureDefinition is already taken");
         }
 
@@ -214,6 +223,12 @@ public class CategoryService {
                         featureValue.setValue(givenEntry.getValue());
                     }
                 }
+            }
+        }
+
+        if(additionalNewValues != null) {
+            for(String newValue : additionalNewValues) {
+                oldFeatureDefinition.getFeatureValueDefinitions().add(new FeatureValue(newValue));
             }
         }
 

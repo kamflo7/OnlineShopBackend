@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureBagDTO;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
+import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTOEditable;
 import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
@@ -185,6 +186,31 @@ public class ProductAndCategoryTests {
     }
 
     @Test
+    public void editFeatureDefinition() {
+        CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
+        categoryService.createFeatureGroup("Informacje techniczne", smartfony);
+        FeatureGroup obtained = categoryService.getCategoriesLogic().get(0).getFeatureGroups().get(0);
+
+        FeatureDefinitionDTO dto = new FeatureDefinitionDTO(true, true, true, "Pamiec RAM", Lists.newArrayList("1GB", "2GB", "3GB"));
+        categoryService.createFeatureDefinition(dto, obtained.getId(), smartfony.getID());
+
+        FeatureDefinition justCreated = smartfony.getFeatureDefinitions().get(0);
+        List<FeatureValue> values = justCreated.getFeatureValueDefinitions();
+
+        Map<Long, String> map = new HashMap<>(3);
+        map.put(values.get(0).getID(), "1024MB");
+        map.put(values.get(1).getID(), "2048MB");
+        map.put(values.get(2).getID(), "3072MB");
+
+        FeatureDefinitionDTOEditable dto2 = new FeatureDefinitionDTOEditable(true, true, true, "Pamiec RAM", false, map);
+        dto2.setNewValues(Lists.newArrayList("4GB", "6GB"));
+
+        categoryService.editFeatureDefinition(smartfony.getID(), obtained.getId(), justCreated.getId(), dto2);
+
+        assertThat(smartfony.getFeatureDefinitions().get(0).getFeatureValueDefinitions().size()).isEqualTo(5);
+    }
+
+    @Test
     public void createFeatureDefinitionWithItsValues() {
         CategoryLogic smartfony = categoryService.createNewCategory("Smartfony");
         categoryService.createFeatureGroup("Informacje techniczne", smartfony);
@@ -211,8 +237,8 @@ public class ProductAndCategoryTests {
         CategoryLogic smartfonyObtained = categoryService.getCategoryLogic("Smartfony");
         List<FeatureDefinition> featureDefinitionsObtained = smartfonyObtained.getFeatureDefinitions();
 
-        assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().size()).isEqualTo(featureDefinitionDTO.getValues().size());
-        assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().get(0).getValue()).isEqualTo(featureDefinitionDTO.getValues().get(0));
+        assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().size()).isEqualTo(featureDefinitionDTO.getNewValues().size());
+        assertThat(featureDefinitionsObtained.get(0).getFeatureValueDefinitions().get(0).getValue()).isEqualTo(featureDefinitionDTO.getNewValues().get(0));
         assertThat(shouldFail).isTrue();
     }
 

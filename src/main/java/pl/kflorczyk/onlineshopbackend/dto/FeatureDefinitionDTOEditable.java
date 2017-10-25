@@ -8,6 +8,7 @@ public class FeatureDefinitionDTOEditable {
     private String name;
 
     private Map<Long, String> values;
+    private List<String> newValues;
 
     private boolean forceUpdate;
 
@@ -29,6 +30,14 @@ public class FeatureDefinitionDTOEditable {
         this.visible = visible;
         this.name = name;
         this.forceUpdate = forceUpdate;
+    }
+
+    public List<String> getNewValues() {
+        return newValues;
+    }
+
+    public void setNewValues(List<String> newValues) {
+        this.newValues = newValues;
     }
 
     public boolean isMultipleValues() {

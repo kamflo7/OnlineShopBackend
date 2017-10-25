@@ -6,17 +6,17 @@ public class FeatureDefinitionDTO {
     private boolean multipleValues, filterable, visible;
     private String name;
 
-    private List<String> values;
+    private List<String> newValues;
 
     public FeatureDefinitionDTO() {
     }
 
-    public FeatureDefinitionDTO(boolean multipleValues, boolean filterable, boolean visible, String name, List<String> values) {
+    public FeatureDefinitionDTO(boolean multipleValues, boolean filterable, boolean visible, String name, List<String> newValues) {
         this.multipleValues = multipleValues;
         this.filterable = filterable;
         this.visible = visible;
         this.name = name;
-        this.values = values;
+        this.newValues = newValues;
     }
 
     public FeatureDefinitionDTO(boolean multipleValues, boolean filterable, boolean visible, String name) {
@@ -58,11 +58,11 @@ public class FeatureDefinitionDTO {
         this.name = name;
     }
 
-    public List<String> getValues() {
-        return values;
+    public List<String> getNewValues() {
+        return newValues;
     }
 
-    public void setValues(List<String> values) {
-        this.values = values;
+    public void setNewValues(List<String> newValues) {
+        this.newValues = newValues;
     }
 }

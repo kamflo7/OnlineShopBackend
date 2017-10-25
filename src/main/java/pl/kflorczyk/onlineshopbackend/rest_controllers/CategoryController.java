@@ -116,7 +116,7 @@ public class CategoryController {
 
     // FeatureGroup section
     @PutMapping(path = "/categories/{categoryID}/feature_groups")
-    public ResponseDetail<CategoryLogic> createFeatureGroup(
+    public String createFeatureGroup(
             @PathVariable(name = "categoryID") long categoryID,
             @RequestParam(name = "name") String name) {
         CategoryLogic categoryLogic = null;
@@ -124,10 +124,10 @@ public class CategoryController {
         try {
             categoryLogic = categoryService.createFeatureGroup(name, categoryID);
         } catch(CategoryNotFoundException | InvalidFeatureGroupNameException e) {
-            return new ResponseDetail<>(ResponseDetail.Status.FAILURE, e.getMessage());
+            return mapToJSON(Claimant.CATEGORY_LOGIC, new ResponseDetail<>(e.getMessage()));
         }
 
-        return new ResponseDetail<>(categoryLogic);
+        return mapToJSON(Claimant.CATEGORY_LOGIC, new ResponseDetail<>(categoryLogic));
     }
 
     @PostMapping(path = "/categories/{categoryID}/feature_groups/{groupID}")
