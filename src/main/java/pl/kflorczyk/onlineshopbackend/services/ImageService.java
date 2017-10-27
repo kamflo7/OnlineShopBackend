@@ -28,7 +28,7 @@ public class ImageService {
         try {
             BufferedImage src = ImageIO.read(new ByteArrayInputStream(decoded));
             File destination = new File(absolute.getAbsolutePath()+"/"+imageName);
-            ImageIO.write(src, "jpg", destination);
+            ImageIO.write(src, "png", destination);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -45,5 +45,21 @@ public class ImageService {
             return null;
         }
         return bytes;
+    }
+
+    public void replaceImageBase64OnDisk(String base64, String imageName) {
+        File absolute = new File(RESOURCE_PATH + IMGS_PATH);
+        File current = new File(absolute.getAbsolutePath()+"/"+imageName);
+        current.delete();
+
+        byte[] decoded = Base64.getDecoder().decode(base64);
+
+        try {
+            BufferedImage src = ImageIO.read(new ByteArrayInputStream(decoded));
+            File destination = new File(absolute.getAbsolutePath()+"/"+imageName);
+            ImageIO.write(src, "png", destination);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

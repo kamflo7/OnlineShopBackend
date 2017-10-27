@@ -145,8 +145,9 @@ public class ProductService {
             product.setImage(new Image());
         }
         productRepository.saveAndFlush(product);
-        imageService.saveImageBase64OnDisk(image, product.getImage().getName());
-//        saveImageToDisk(image, product.getImage().getName());
+        if(image != null) {
+            imageService.saveImageBase64OnDisk(image, product.getImage().getName());
+        }
         return product;
     }
 
@@ -182,7 +183,7 @@ public class ProductService {
             }
 
             Product alreadyExists = productRepository.findFirst1ByNameIgnoreCase(data.getName());
-            if(alreadyExists != null) {
+            if(alreadyExists != null && productID != alreadyExists.getID()) {
                 throw new ProductAlreadyExistsException("The given name is already taken");
             }
             product.setName(data.getName());
@@ -212,7 +213,18 @@ public class ProductService {
             }
         }
 
-        productRepository.saveAndFlush(product);
+        if(data.getImage() != null) {
+            if(product.getImage() != null) { // already has Image, so edit
+                String imageName = product.getImage().getName();
+                imageService.replaceImageBase64OnDisk(data.getImage(), imageName);
+                productRepository.saveAndFlush(product);
+            } else {                        // create new image
+                product.setImage(new Image());
+                productRepository.saveAndFlush(product);
+                imageService.saveImageBase64OnDisk(data.getImage(), product.getImage().getName());
+            }
+        }
+
         return product;
     }
 

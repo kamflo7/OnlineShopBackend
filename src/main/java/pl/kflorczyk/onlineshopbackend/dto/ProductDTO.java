@@ -14,13 +14,13 @@ public class ProductDTO {
     private Map<Long, List<Long>> features;
     
     private String image;
+
     public String getImage() {
         return image;
     }
     public void setImage(String image) {
         this.image = image;
     }
-    // end test
 
     public ProductDTO() { }
 
