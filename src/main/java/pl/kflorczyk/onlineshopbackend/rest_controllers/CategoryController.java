@@ -180,13 +180,13 @@ public class CategoryController {
         return result;
     }
 
-    @PostMapping(path = "/products/test/{productID}")
-    public String editProductTEST(
-            @PathVariable(name = "productID") long productID,
-            @RequestBody ProductDTO productDTO
-    ) {
-        return null;
-    }
+//    @PostMapping(path = "/products/{productID}")
+//    public String editProduct(
+//            @PathVariable(name = "productID") long productID,
+//            @RequestBody ProductDTO productDTO
+//    ) {
+//        return null;
+//    }
 
     @PostMapping(path = "/products/{productID}")
     public String editProduct(
@@ -236,6 +236,7 @@ public class CategoryController {
                     .writer(getJSONFilters(Claimant.MANY_PRODUCTS))
                     .writeValueAsString(new ResponseDetail<>(products));
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
             return null;
         }
 
@@ -334,7 +335,10 @@ public class CategoryController {
                     .addFilter("Product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
                                     "categoryLogic", "featureGroup", "featureValueDefinitions",
-                                    "visible", "filterable", "multipleValues", "name"));
+                                    "visible", "filterable", "multipleValues", "name"))
+                    .addFilter("FeatureBag", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept("featureGroup", "categoryLogic", "featureValueDefinitions"))
+                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll());
         } else if(claimant == Claimant.ONE_PRODUCT) {
 //            return new SimpleFilterProvider()
 //                    .addFilter("Product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))

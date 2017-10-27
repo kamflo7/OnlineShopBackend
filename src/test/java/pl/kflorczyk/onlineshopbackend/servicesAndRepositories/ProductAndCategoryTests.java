@@ -208,6 +208,10 @@ public class ProductAndCategoryTests {
         categoryService.editFeatureDefinition(smartfony.getID(), obtained.getId(), justCreated.getId(), dto2);
 
         assertThat(smartfony.getFeatureDefinitions().get(0).getFeatureValueDefinitions().size()).isEqualTo(5);
+
+        String[] expectedValues = new String[] {"1024MB", "2048MB", "3072MB", "4GB", "6GB"};
+        for(int i=0; i<5; i++)
+            assertThat(smartfony.getFeatureDefinitions().get(0).getFeatureValueDefinitions().get(i).getValue()).isEqualTo(expectedValues[i]);
     }
 
     @Test
