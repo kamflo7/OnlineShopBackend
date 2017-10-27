@@ -127,7 +127,10 @@ public class FeatureDefinition {
 
     @Override
     public String toString() {
-        return String.format("%d:%s", id, name);
+        return String.format("%d", id);
+        // when JSON parses Map<FeatureDefinition, FeatureValueGroup>,
+        // the key for FeatureDefinition object is its .toString()
+        // look at parsing CategoryView
     }
 
     public boolean isVisible() {

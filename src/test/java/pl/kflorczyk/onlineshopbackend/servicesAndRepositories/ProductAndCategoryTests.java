@@ -21,6 +21,7 @@ import pl.kflorczyk.onlineshopbackend.services.CategoryService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -265,6 +266,46 @@ public class ProductAndCategoryTests {
 
         assertThat(all.size()).isEqualTo(1);
         assertThat(all.get(0).getFeatureBags().size()).isEqualTo(5);
+    }
+
+    @Test
+    public void categoryViewTestRepository() {
+        setupDatabaseStructure();
+        setupDatabaseContent();
+
+        CategoryView main = new CategoryView("Telefony i GSM");
+        categoryViewRepository.saveAndFlush(main);
+
+        CategoryView smartfony = new CategoryView("Smartfony grupa");
+        smartfony.setCategoryLogic(categoryLogicSmartphones);
+        smartfony.setParent(main);
+        categoryViewRepository.saveAndFlush(smartfony);
+
+        CategoryView android = new CategoryView("Android");
+        android.setCategoryLogic(categoryLogicSmartphones);
+        android.setParent(smartfony);
+        Map<FeatureDefinition, FeatureValueGroup> map = new HashMap<>();
+        map.put(featureDefRAM, new FeatureValueGroup(Lists.newArrayList(ram2GB, ram4GB)));
+        android.setFilters(map);
+        categoryViewRepository.saveAndFlush(android);
+    }
+
+    @Test
+    public void createCategoryView() {
+        setupDatabaseStructure();
+        setupDatabaseContent();
+
+        // root category
+        CategoryView categoryRoot = categoryService.createCategoryView("Telefony i GSM", null, null, null);
+
+        // typical category
+        CategoryView categorySmartphones = categoryService.createCategoryView("Smartfony", categoryRoot.getId(), categoryLogicSmartphones.getID(), null);
+
+        // special category with filters
+        Map<Long, List<Long>> filters = new HashMap<>();
+        filters.put(featureDefRAM.getId(), Lists.newArrayList(ram2GB.getID(), ram4GB.getID()));
+        CategoryView categoryFilters = categoryService.createCategoryView("Ram below 4GB", categorySmartphones.getId(), categoryLogicSmartphones.getID(), filters);
+        // todo: test is OK, add asserts later
     }
 
     @Test

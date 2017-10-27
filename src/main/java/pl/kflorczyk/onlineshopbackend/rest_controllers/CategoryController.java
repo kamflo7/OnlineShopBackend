@@ -12,6 +12,7 @@ import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTOEditable;
 import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
+import pl.kflorczyk.onlineshopbackend.model.CategoryView;
 import pl.kflorczyk.onlineshopbackend.model.Product;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.Response;
@@ -31,7 +32,7 @@ public class CategoryController {
     @Autowired
     private ProductService productService;
 
-    // Category section
+// Category section
     @GetMapping(path = "/categories")
     public String getCategories() {
         List<CategoryLogic> categories = categoryService.getCategoriesLogic();
@@ -115,7 +116,35 @@ public class CategoryController {
         return mapToJSON(Claimant.CATEGORY_LOGIC, new ResponseDetail<>(edited));
     }
 
-    // FeatureGroup section
+// CategoryView (Navigation) section
+    @GetMapping("/navigations/{id}")
+    public String getNavigation(@PathVariable(name = "id") long id) {
+        CategoryView categoryView = categoryService.getCategoryView(id);
+        return mapToJSON(Claimant.ONE_CATEGORY_VIEW, new ResponseDetail<>(categoryView));
+    }
+
+    @PutMapping("/navigations")
+    public String createNavigation(
+            @RequestParam(name = "name") String name,
+            @RequestParam(name = "parentID", required = false) Long parentID,
+            @RequestParam(name = "categoryLogicID", required = false) Long categoryLogicID,
+            @RequestBody(required = false) Map<Long, List<Long>> filters
+    ) {
+        CategoryView categoryView = null;
+        try {
+            categoryView = categoryService.createCategoryView(name, parentID, categoryLogicID, filters);
+        } catch(InvalidCategoryNameException |
+                CategoryNotFoundException |
+                CategoryViewNotFoundException |
+                NullPointerException |
+                IncompatibleFeatureDefinitionAssignmentException |
+                IncompatibleFeatureValueDefinitionAssignmentException e) {
+            return mapToJSON(Claimant.ONE_CATEGORY_VIEW, new Response(Response.Status.FAILURE, e.getMessage()));
+        }
+        return mapToJSON(Claimant.ONE_CATEGORY_VIEW, new ResponseDetail<CategoryView>(categoryView));
+    }
+
+// FeatureGroup section
     @PutMapping(path = "/categories/{categoryID}/feature_groups")
     public String createFeatureGroup(
             @PathVariable(name = "categoryID") long categoryID,
@@ -145,7 +174,7 @@ public class CategoryController {
         }
         return mapToJSON(Claimant.CATEGORY_LOGIC, new ResponseDetail<>(edited));
     }
-    // Product section
+// Product section
     @PutMapping(path = "/categories/{categoryID}/products")
     public String createProduct(
         @PathVariable(name = "categoryID") long categoryID,
@@ -256,7 +285,7 @@ public class CategoryController {
         return result;
     }
 
-    // FeatureDefinition section
+// FeatureDefinition section
     @PutMapping(path = "/categories/{categoryID}/feature_groups/{groupID}/feature_definitions")
     public String createFeatureDefinition(
             @PathVariable(name = "categoryID") long categoryID,
@@ -355,6 +384,13 @@ public class CategoryController {
                     .addFilter("CategoryLogic", SimpleBeanPropertyFilter.serializeAllExcept(
                             "featureDefinitions", "featureGroups"
                     ));
+        } else if(claimant == Claimant.ONE_CATEGORY_VIEW) {
+            return new SimpleFilterProvider()
+                    .addFilter("CategoryView", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("CategoryLogic", SimpleBeanPropertyFilter.serializeAllExcept("featureDefinitions", "featureGroups"))
+                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
+                            "featureGroup", "categoryLogic", "featureValueDefinitions", "multipleValues", "filterable", "visible"))
+                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll());
         }
         return null;
     }
@@ -362,8 +398,11 @@ public class CategoryController {
     private enum Claimant {
         ONE_PRODUCT,
         MANY_PRODUCTS,
+
         CATEGORY_LOGIC,
-        MANY_CATEGORIES_LOGIC
+        MANY_CATEGORIES_LOGIC,
+
+        ONE_CATEGORY_VIEW
     }
 
     private String mapToJSON(Claimant claimant, Object valueToMap) {
