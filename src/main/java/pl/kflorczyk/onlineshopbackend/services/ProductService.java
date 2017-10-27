@@ -11,17 +11,23 @@ import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
 import pl.kflorczyk.onlineshopbackend.repositories.ProductRepository;
 import pl.kflorczyk.onlineshopbackend.validators.ProductValidator;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProductService {
 
     private ProductRepository productRepository;
     private CategoryLogicRepository categoryLogicRepository;
+
+    @Autowired
+    private ImageService imageService;
 
     public ProductService(@Autowired ProductRepository productRepository, @Autowired CategoryLogicRepository categoryLogicRepository) {
         this.productRepository = productRepository;
@@ -116,7 +122,7 @@ public class ProductService {
         return true;
     }
 
-    private Product createProduct(CategoryLogic categoryLogic, String name, String description, BigDecimal price, int amount, List<FeatureBagDTO> features) {
+    private Product createProduct(CategoryLogic categoryLogic, String name, String description, BigDecimal price, int amount, List<FeatureBagDTO> features, String image) {
         ProductValidator validator = new ProductValidator(name, description);
         if(!validator.validateName()) {
             throw new InvalidProductNameException("Invalid product name");
@@ -134,12 +140,17 @@ public class ProductService {
             FeatureBag featureBag = new FeatureBag(featureBagDTO.getFeatureDefinition(), featureBagDTO.getFeatureValues());
             product.addFeature(featureBag);
         }
-        productRepository.saveAndFlush(product);
 
+        if(image != null) {
+            product.setImage(new Image());
+        }
+        productRepository.saveAndFlush(product);
+        imageService.saveImageBase64OnDisk(image, product.getImage().getName());
+//        saveImageToDisk(image, product.getImage().getName());
         return product;
     }
 
-    public Product createProduct(long categoryLogicID, String name, String description, BigDecimal price, int amount, Map<Long, List<Long>> features) {
+    public Product createProduct(long categoryLogicID, String name, String description, BigDecimal price, int amount, Map<Long, List<Long>> features, String image) {
         CategoryLogic categoryLogic = categoryLogicRepository.findOne(categoryLogicID);
 
         if(categoryLogic == null) {
@@ -147,11 +158,11 @@ public class ProductService {
         }
 
         List<FeatureBagDTO> outputTranslatedFeatures = convertProductRawDataToFeatureBagDTO(categoryLogic, features);
-        return createProduct(categoryLogic, name, description, price, amount, outputTranslatedFeatures);
+        return createProduct(categoryLogic, name, description, price, amount, outputTranslatedFeatures, image);
     }
 
     public Product createProduct(long categoryLogicID, ProductDTO productDTO) {
-        return createProduct(categoryLogicID, productDTO.getName(), productDTO.getDescription(), productDTO.getPrice(), productDTO.getAmount(), productDTO.getFeatures());
+        return createProduct(categoryLogicID, productDTO.getName(), productDTO.getDescription(), productDTO.getPrice(), productDTO.getAmount(), productDTO.getFeatures(), productDTO.getImage());
     }
 
     public Product editProduct(long productID, ProductDTO data) {

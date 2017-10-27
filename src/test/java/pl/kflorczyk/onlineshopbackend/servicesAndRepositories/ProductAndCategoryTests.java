@@ -281,7 +281,7 @@ public class ProductAndCategoryTests {
         try {
             productService.createProduct(categoryLogicSmartphones.getID(),
                     "Huawei Mate 4", "Najnowszy telefon z premiera w pazdzierniku 2017 (chyba)",
-                    new BigDecimal("1980.0"), 15, features);
+                    new BigDecimal("1980.0"), 15, features, null);
         } catch(RuntimeException e) {
             fail("Should not throw runtimeexception: " + e.getMessage());
         }

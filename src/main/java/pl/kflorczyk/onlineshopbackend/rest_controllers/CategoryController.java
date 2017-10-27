@@ -17,6 +17,7 @@ import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.Response;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.ResponseDetail;
 import pl.kflorczyk.onlineshopbackend.services.CategoryService;
+import pl.kflorczyk.onlineshopbackend.services.ImageService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
 import java.util.*;
@@ -180,14 +181,6 @@ public class CategoryController {
         return result;
     }
 
-//    @PostMapping(path = "/products/{productID}")
-//    public String editProduct(
-//            @PathVariable(name = "productID") long productID,
-//            @RequestBody ProductDTO productDTO
-//    ) {
-//        return null;
-//    }
-
     @PostMapping(path = "/products/{productID}")
     public String editProduct(
             @PathVariable(name = "productID") long productID,
@@ -340,13 +333,6 @@ public class CategoryController {
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept("featureGroup", "categoryLogic", "featureValueDefinitions"))
                     .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll());
         } else if(claimant == Claimant.ONE_PRODUCT) {
-//            return new SimpleFilterProvider()
-//                    .addFilter("Product", SimpleBeanPropertyFilter.serializeAllExcept("categoryLogic"))
-//                    .addFilter("FeatureBag", SimpleBeanPropertyFilter.serializeAllExcept("id"))
-//                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAllExcept("id"))
-//                    .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
-//                            "id", "featureGroup", "categoryLogic", "featureValueDefinitions"
-//                    ));
             return new SimpleFilterProvider()
                     .addFilter("Product", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("CategoryLogic", SimpleBeanPropertyFilter.filterOutAllExcept("id"))

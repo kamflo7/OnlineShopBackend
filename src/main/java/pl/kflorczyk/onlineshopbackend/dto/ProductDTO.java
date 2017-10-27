@@ -12,8 +12,7 @@ public class ProductDTO {
     private Integer amount;
 
     private Map<Long, List<Long>> features;
-
-    // test
+    
     private String image;
     public String getImage() {
         return image;
