@@ -237,6 +237,10 @@ public class CategoryService {
         return categoryViewRepository.findOne(id);
     }
 
+    public List<CategoryView> getCategoriesView() {
+        return categoryViewRepository.findAll();
+    }
+
     public CategoryView createCategoryView(String name, Long parentID, Long categoryLogicID, Map<Long, List<Long>> features) {
         SimpleNameValidator validator = new SimpleNameValidator(2);
         if(name == null || !validator.validate(name)) {

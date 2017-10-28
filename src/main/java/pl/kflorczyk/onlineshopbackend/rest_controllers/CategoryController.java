@@ -18,7 +18,6 @@ import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.Response;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.ResponseDetail;
 import pl.kflorczyk.onlineshopbackend.services.CategoryService;
-import pl.kflorczyk.onlineshopbackend.services.ImageService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
 import java.util.*;
@@ -120,7 +119,13 @@ public class CategoryController {
     @GetMapping("/navigations/{id}")
     public String getNavigation(@PathVariable(name = "id") long id) {
         CategoryView categoryView = categoryService.getCategoryView(id);
-        return mapToJSON(Claimant.ONE_CATEGORY_VIEW, new ResponseDetail<>(categoryView));
+        return mapToJSON(Claimant.CATEGORY_VIEW, new ResponseDetail<>(categoryView));
+    }
+
+    @GetMapping("/navigations")
+    public String getNavigations() {
+        List<CategoryView> categoriesView = categoryService.getCategoriesView();
+        return mapToJSON(Claimant.CATEGORY_VIEW, new ResponseDetail<>(categoriesView));
     }
 
     @PutMapping("/navigations")
@@ -139,9 +144,20 @@ public class CategoryController {
                 NullPointerException |
                 IncompatibleFeatureDefinitionAssignmentException |
                 IncompatibleFeatureValueDefinitionAssignmentException e) {
-            return mapToJSON(Claimant.ONE_CATEGORY_VIEW, new Response(Response.Status.FAILURE, e.getMessage()));
+            return mapToJSON(Claimant.CATEGORY_VIEW, new Response(Response.Status.FAILURE, e.getMessage()));
         }
-        return mapToJSON(Claimant.ONE_CATEGORY_VIEW, new ResponseDetail<CategoryView>(categoryView));
+        return mapToJSON(Claimant.CATEGORY_VIEW, new ResponseDetail<CategoryView>(categoryView));
+    }
+
+    @PostMapping("/navigations/{id}")
+    public String updateNavigation(
+        @RequestParam(name = "name") String name,
+        @RequestParam(name = "parentID", required = false) Long parentID,
+        @RequestParam(name = "categoryLogicID", required = false) Long categoryLogicID,
+        @RequestBody(required = false) Map<Long, List<Long>> filters
+    ) {
+        // todo
+        return null;
     }
 
 // FeatureGroup section
@@ -384,7 +400,7 @@ public class CategoryController {
                     .addFilter("CategoryLogic", SimpleBeanPropertyFilter.serializeAllExcept(
                             "featureDefinitions", "featureGroups"
                     ));
-        } else if(claimant == Claimant.ONE_CATEGORY_VIEW) {
+        } else if(claimant == Claimant.CATEGORY_VIEW) {
             return new SimpleFilterProvider()
                     .addFilter("CategoryView", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("CategoryLogic", SimpleBeanPropertyFilter.serializeAllExcept("featureDefinitions", "featureGroups"))
@@ -402,7 +418,7 @@ public class CategoryController {
         CATEGORY_LOGIC,
         MANY_CATEGORIES_LOGIC,
 
-        ONE_CATEGORY_VIEW
+        CATEGORY_VIEW,
     }
 
     private String mapToJSON(Claimant claimant, Object valueToMap) {
