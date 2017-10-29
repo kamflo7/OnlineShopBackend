@@ -255,7 +255,7 @@ public class ProductAndCategoryTests {
         productService = new ProductService(productRepository, categoryLogicRepository);
 
         // pure filter params in URL
-        String urlParams = String.format("%d=%d,%d=%d.%d.%d,prc=100.0-5000.0",
+        String urlParams = String.format("%d-%d,%d-%d.%d.%d,prc-100.0_5000.0",
                 featureDefRAM.getId(), ram6GB.getID(),
                 featureDefConnection.getId(), connWifi.getID(), connBt42.getID(), connNfc.getID());
 
@@ -306,6 +306,7 @@ public class ProductAndCategoryTests {
 //        filters.put(featureDefRAM.getId(), Lists.newArrayList(ram2GB.getID(), ram4GB.getID()));
 //        CategoryView categoryFilters = categoryService.createCategoryView("Ram below 4GB", categorySmartphones.getId(), categoryLogicSmartphones.getID(), filters);
         // todo: test is OK, add asserts later
+        assertThat(categorySmartphones.getCategoryLogic().getID()).isEqualTo(categoryLogicSmartphones.getID());
     }
 
     @Test

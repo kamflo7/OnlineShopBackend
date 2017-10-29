@@ -21,11 +21,11 @@ public class FilterParametersURLConverter {
             return null;
 
         for(String filter : filters) {
-            String[] parts = filter.split("=");
+            String[] parts = filter.split("-");
             if(parts.length != 2) continue;
 
             if(parts[0].equals(FilterParameters.FILTER_PRICE)) { // todo: dummy solution, don't have enough time, fix later
-                String[] values = parts[1].split("-");
+                String[] values = parts[1].split("_");
                 if(values.length != 2) continue;
 
                 try {
