@@ -241,7 +241,7 @@ public class CategoryService {
         return categoryViewRepository.findAll();
     }
 
-    public CategoryView createCategoryView(String name, Long parentID, Long categoryLogicID, Map<Long, List<Long>> features) {
+    public CategoryView createCategoryView(String name, Long parentID, Long categoryLogicID) {
         SimpleNameValidator validator = new SimpleNameValidator(2);
         if(name == null || !validator.validate(name)) {
             throw new InvalidCategoryNameException("Invalid name for category");
@@ -264,47 +264,47 @@ public class CategoryService {
             }
         }
 
-        if(features != null && categoryLogicID == null) {
-            throw new NullPointerException("If features are present, the categoryLogicID should also be present");
-        }
+//        if(features != null && categoryLogicID == null) {
+//            throw new NullPointerException("If features are present, the categoryLogicID should also be present");
+//        }
 
-        Map<FeatureDefinition, FeatureValueGroup> translatedMap = null;
-        if(features != null) {
-            try {
-                translatedMap = translateNavigationFeaturesIndexesToEntities(features, categoryLogic);
-            } catch (IncompatibleFeatureDefinitionAssignmentException | IncompatibleFeatureValueDefinitionAssignmentException e) {
-                throw e;
-            }
-        }
+//        Map<FeatureDefinition, FeatureValueGroup> translatedMap = null;
+//        if(features != null) {
+//            try {
+//                translatedMap = translateNavigationFeaturesIndexesToEntities(features, categoryLogic);
+//            } catch (IncompatibleFeatureDefinitionAssignmentException | IncompatibleFeatureValueDefinitionAssignmentException e) {
+//                throw e;
+//            }
+//        }
 
         CategoryView categoryView = new CategoryView(name);
         categoryView.setParent(parent);
         categoryView.setCategoryLogic(categoryLogic);
-        categoryView.setFilters(translatedMap);
+//        categoryView.setFilters(translatedMap);
 
         categoryViewRepository.saveAndFlush(categoryView);
         return categoryView;
     }
 
-    private Map<FeatureDefinition, FeatureValueGroup> translateNavigationFeaturesIndexesToEntities(Map<Long, List<Long>> rawMap, CategoryLogic categoryLogic) {
-        Map<FeatureDefinition, FeatureValueGroup> result = new HashMap<>();
-        for(Map.Entry<Long, List<Long>> rawDefinitionIndex : rawMap.entrySet()) {
-            Optional<FeatureDefinition> appropriateDef = categoryLogic.getFeatureDefinitions().stream().filter(f -> f.getId() == rawDefinitionIndex.getKey()).findAny();
-            if(!appropriateDef.isPresent()) {
-                throw new IncompatibleFeatureDefinitionAssignmentException("Incompatible filters in terms of CategoryLogic");
-            }
-
-            List<FeatureValue> featureValues = new ArrayList<>();
-            for(Long rawFeatureValue : rawDefinitionIndex.getValue()) {
-                Optional<FeatureValue> appropriateValueDef = appropriateDef.get().getFeatureValueDefinitions().stream().filter(fv -> fv.getID() == rawFeatureValue).findAny();
-                if(!appropriateValueDef.isPresent()) {
-                    throw new IncompatibleFeatureValueDefinitionAssignmentException("Incompatible filters in terms of CategoryLogic");
-                }
-
-                featureValues.add(appropriateValueDef.get());
-            }
-            result.put(appropriateDef.get(), new FeatureValueGroup(featureValues));
-        }
-        return result;
-    }
+//    private Map<FeatureDefinition, FeatureValueGroup> translateNavigationFeaturesIndexesToEntities(Map<Long, List<Long>> rawMap, CategoryLogic categoryLogic) {
+//        Map<FeatureDefinition, FeatureValueGroup> result = new HashMap<>();
+//        for(Map.Entry<Long, List<Long>> rawDefinitionIndex : rawMap.entrySet()) {
+//            Optional<FeatureDefinition> appropriateDef = categoryLogic.getFeatureDefinitions().stream().filter(f -> f.getId() == rawDefinitionIndex.getKey()).findAny();
+//            if(!appropriateDef.isPresent()) {
+//                throw new IncompatibleFeatureDefinitionAssignmentException("Incompatible filters in terms of CategoryLogic");
+//            }
+//
+//            List<FeatureValue> featureValues = new ArrayList<>();
+//            for(Long rawFeatureValue : rawDefinitionIndex.getValue()) {
+//                Optional<FeatureValue> appropriateValueDef = appropriateDef.get().getFeatureValueDefinitions().stream().filter(fv -> fv.getID() == rawFeatureValue).findAny();
+//                if(!appropriateValueDef.isPresent()) {
+//                    throw new IncompatibleFeatureValueDefinitionAssignmentException("Incompatible filters in terms of CategoryLogic");
+//                }
+//
+//                featureValues.add(appropriateValueDef.get());
+//            }
+//            result.put(appropriateDef.get(), new FeatureValueGroup(featureValues));
+//        }
+//        return result;
+//    }
 }

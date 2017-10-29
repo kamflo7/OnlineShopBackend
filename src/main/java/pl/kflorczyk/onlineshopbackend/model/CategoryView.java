@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +30,9 @@ public class CategoryView {
     @JoinColumn(name = "category_logic_id")
     private CategoryLogic categoryLogic;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private Map<FeatureDefinition, FeatureValueGroup> filters = new HashMap<>();
+//    @OneToMany(cascade = CascadeType.ALL)
+//    private Map<FeatureDefinition, FeatureValueGroup> filters = new HashMap<>();
+
 
     public CategoryView() { }
 
@@ -64,13 +66,5 @@ public class CategoryView {
 
     public void setCategoryLogic(CategoryLogic categoryLogic) {
         this.categoryLogic = categoryLogic;
-    }
-
-    public Map<FeatureDefinition, FeatureValueGroup> getFilters() {
-        return filters;
-    }
-
-    public void setFilters(Map<FeatureDefinition, FeatureValueGroup> filters) {
-        this.filters = filters;
     }
 }

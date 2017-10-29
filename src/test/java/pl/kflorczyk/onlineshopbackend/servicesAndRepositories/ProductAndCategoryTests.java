@@ -284,9 +284,9 @@ public class ProductAndCategoryTests {
         CategoryView android = new CategoryView("Android");
         android.setCategoryLogic(categoryLogicSmartphones);
         android.setParent(smartfony);
-        Map<FeatureDefinition, FeatureValueGroup> map = new HashMap<>();
-        map.put(featureDefRAM, new FeatureValueGroup(Lists.newArrayList(ram2GB, ram4GB)));
-        android.setFilters(map);
+//        Map<FeatureDefinition, FeatureValueGroup> map = new HashMap<>();
+//        map.put(featureDefRAM, new FeatureValueGroup(Lists.newArrayList(ram2GB, ram4GB)));
+//        android.setFilters(map);
         categoryViewRepository.saveAndFlush(android);
     }
 
@@ -296,15 +296,15 @@ public class ProductAndCategoryTests {
         setupDatabaseContent();
 
         // root category
-        CategoryView categoryRoot = categoryService.createCategoryView("Telefony i GSM", null, null, null);
+        CategoryView categoryRoot = categoryService.createCategoryView("Telefony i GSM", null, null);
 
         // typical category
-        CategoryView categorySmartphones = categoryService.createCategoryView("Smartfony", categoryRoot.getId(), categoryLogicSmartphones.getID(), null);
+        CategoryView categorySmartphones = categoryService.createCategoryView("Smartfony", categoryRoot.getId(), categoryLogicSmartphones.getID());
 
         // special category with filters
-        Map<Long, List<Long>> filters = new HashMap<>();
-        filters.put(featureDefRAM.getId(), Lists.newArrayList(ram2GB.getID(), ram4GB.getID()));
-        CategoryView categoryFilters = categoryService.createCategoryView("Ram below 4GB", categorySmartphones.getId(), categoryLogicSmartphones.getID(), filters);
+//        Map<Long, List<Long>> filters = new HashMap<>();
+//        filters.put(featureDefRAM.getId(), Lists.newArrayList(ram2GB.getID(), ram4GB.getID()));
+//        CategoryView categoryFilters = categoryService.createCategoryView("Ram below 4GB", categorySmartphones.getId(), categoryLogicSmartphones.getID(), filters);
         // todo: test is OK, add asserts later
     }
 

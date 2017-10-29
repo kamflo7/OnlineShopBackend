@@ -132,12 +132,12 @@ public class CategoryController {
     public String createNavigation(
             @RequestParam(name = "name") String name,
             @RequestParam(name = "parentID", required = false) Long parentID,
-            @RequestParam(name = "categoryLogicID", required = false) Long categoryLogicID,
-            @RequestBody(required = false) Map<Long, List<Long>> filters
+            @RequestParam(name = "categoryLogicID", required = false) Long categoryLogicID
+//            @RequestBody(required = false) Map<Long, List<Long>> filters
     ) {
         CategoryView categoryView = null;
         try {
-            categoryView = categoryService.createCategoryView(name, parentID, categoryLogicID, filters);
+            categoryView = categoryService.createCategoryView(name, parentID, categoryLogicID);
         } catch(InvalidCategoryNameException |
                 CategoryNotFoundException |
                 CategoryViewNotFoundException |
