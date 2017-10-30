@@ -213,6 +213,8 @@ public class ProductService {
                 Optional<FeatureBag> realFeatureBag = product.getFeatureBags().stream().filter(f -> f.getFeatureDefinition().getId() == featureBagDTO.getFeatureDefinition().getId()).findAny();
                 if(realFeatureBag.isPresent()) {
                     realFeatureBag.get().setFeatureValues(featureBagDTO.getFeatureValues());
+                } else {
+                    product.addFeature(new FeatureBag(featureBagDTO.getFeatureDefinition(), featureBagDTO.getFeatureValues()));
                 }
             }
         }
@@ -227,6 +229,8 @@ public class ProductService {
                 productRepository.saveAndFlush(product);
                 imageService.saveImageBase64OnDisk(data.getImage(), product.getImage().getName());
             }
+        } else {
+            productRepository.saveAndFlush(product);
         }
 
         return product;
