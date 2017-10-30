@@ -105,7 +105,7 @@ public class CategoryController {
     }
 
     @PostMapping(path = "/categories/{id}")
-    public String editCategory(@PathVariable long id, @RequestParam(name = "name") String name) {
+    public String editCategory(@PathVariable(name = "id") long id, @RequestParam(name = "name") String name) {
         CategoryLogic edited = null;
         try {
             edited = categoryService.editCategoryLogic(id, name);
@@ -115,9 +115,14 @@ public class CategoryController {
         return mapToJSON(Claimant.CATEGORY_LOGIC, new ResponseDetail<>(edited));
     }
 
-// CategoryView (Navigation) section
     @GetMapping("/navigations/{id}")
     public String getNavigation(@PathVariable(name = "id") long id) {
+        CategoryView categoryView = categoryService.getCategoryView(id);
+        return mapToJSON(Claimant.CATEGORY_VIEW, new ResponseDetail<>(categoryView));
+    }
+
+    @GetMapping("/navigations/{id}/tree")
+    public String getNavigationTree(@PathVariable(name= "id") long id) {
         CategoryView categoryView = categoryService.getCategoryView(id);
         return mapToJSON(Claimant.CATEGORY_VIEW, new ResponseDetail<>(categoryView));
     }
