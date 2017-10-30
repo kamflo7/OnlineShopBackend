@@ -37,6 +37,8 @@ public class FeatureDefinition {
 
     private boolean visible;
 
+    private boolean visibleInList;
+
     // not the best ofc, but don't have enough time to redesign FilterParameters logic, so this is temporary solution
     // todo: dummy solution, don't have enough time, fix later
     @Transient
@@ -69,6 +71,18 @@ public class FeatureDefinition {
         FeatureDefinition fd = new FeatureDefinition();
         fd.dummyPriceFilter = true;
         return fd;
+    }
+
+    public boolean isVisibleInList() {
+        return visibleInList;
+    }
+
+    public void setVisibleInList(boolean visibleInList) {
+        this.visibleInList = visibleInList;
+    }
+
+    public void setDummyPriceFilter(boolean dummyPriceFilter) {
+        this.dummyPriceFilter = dummyPriceFilter;
     }
 
     public boolean isDummyPriceFilter() {

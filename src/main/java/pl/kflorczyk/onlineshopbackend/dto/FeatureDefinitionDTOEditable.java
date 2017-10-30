@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public class FeatureDefinitionDTOEditable {
-    private boolean multipleValues, filterable, visible;
+    private boolean multipleValues, filterable, visible, visibleInList;
     private String name;
 
     private Map<Long, String> values;
@@ -15,21 +15,31 @@ public class FeatureDefinitionDTOEditable {
     public FeatureDefinitionDTOEditable() {
     }
 
-    public FeatureDefinitionDTOEditable(boolean multipleValues, boolean filterable, boolean visible, String name, boolean forceUpdate, Map<Long, String> values) {
+    public FeatureDefinitionDTOEditable(boolean multipleValues, boolean filterable, boolean visible, boolean visibleInList, String name, boolean forceUpdate, Map<Long, String> values) {
         this.multipleValues = multipleValues;
         this.filterable = filterable;
         this.visible = visible;
         this.name = name;
         this.forceUpdate = forceUpdate;
         this.values = values;
+        this.visibleInList = visibleInList;
     }
 
-    public FeatureDefinitionDTOEditable(boolean multipleValues, boolean filterable, boolean visible, String name, boolean forceUpdate) {
+    public FeatureDefinitionDTOEditable(boolean multipleValues, boolean filterable, boolean visible, boolean visibleInList, String name, boolean forceUpdate) {
         this.multipleValues = multipleValues;
         this.filterable = filterable;
         this.visible = visible;
         this.name = name;
         this.forceUpdate = forceUpdate;
+        this.visibleInList = visibleInList;
+    }
+
+    public boolean isVisibleInList() {
+        return visibleInList;
+    }
+
+    public void setVisibleInList(boolean visibleInList) {
+        this.visibleInList = visibleInList;
     }
 
     public List<String> getNewValues() {

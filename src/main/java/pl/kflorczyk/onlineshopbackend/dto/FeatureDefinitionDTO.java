@@ -3,7 +3,7 @@ package pl.kflorczyk.onlineshopbackend.dto;
 import java.util.List;
 
 public class FeatureDefinitionDTO {
-    private boolean multipleValues, filterable, visible;
+    private boolean multipleValues, filterable, visible, visibleInList;
     private String name;
 
     private List<String> newValues;
@@ -11,19 +11,29 @@ public class FeatureDefinitionDTO {
     public FeatureDefinitionDTO() {
     }
 
-    public FeatureDefinitionDTO(boolean multipleValues, boolean filterable, boolean visible, String name, List<String> newValues) {
+    public FeatureDefinitionDTO(boolean multipleValues, boolean filterable, boolean visible, boolean visibleInList, String name, List<String> newValues) {
         this.multipleValues = multipleValues;
         this.filterable = filterable;
         this.visible = visible;
         this.name = name;
         this.newValues = newValues;
+        this.visibleInList = visibleInList;
     }
 
-    public FeatureDefinitionDTO(boolean multipleValues, boolean filterable, boolean visible, String name) {
+    public FeatureDefinitionDTO(boolean multipleValues, boolean filterable, boolean visible, boolean visibleInList, String name) {
         this.multipleValues = multipleValues;
         this.filterable = filterable;
         this.visible = visible;
         this.name = name;
+        this.visibleInList = visibleInList;
+    }
+
+    public boolean isVisibleInList() {
+        return visibleInList;
+    }
+
+    public void setVisibleInList(boolean visibleInList) {
+        this.visibleInList = visibleInList;
     }
 
     public boolean isMultipleValues() {
