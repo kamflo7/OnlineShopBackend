@@ -98,6 +98,7 @@ public class CategoryService {
         });
 
         FeatureDefinition featureDefinition = new FeatureDefinition(featureDefinitionDTO.getName(), featureGroup, featureDefinitionDTO.isFilterable(), featureDefinitionDTO.isMultipleValues(), featureDefinitionDTO.isVisible());
+        featureDefinition.setVisibleInList(featureDefinitionDTO.isVisibleInList());
         categoryLogic.addFeatureDefinition(featureDefinition);
 
         List<FeatureValue> featureValues = new ArrayList<>(featureDefinitionDTO.getNewValues().size());
@@ -211,6 +212,7 @@ public class CategoryService {
         oldFeatureDefinition.setMultipleValues(newFeatureDefinition.isMultipleValues());
         oldFeatureDefinition.setFilterable(newFeatureDefinition.isFilterable());
         oldFeatureDefinition.setVisible(newFeatureDefinition.isVisible());
+        oldFeatureDefinition.setVisibleInList(newFeatureDefinition.isVisibleInList());
         oldFeatureDefinition.setName(newFeatureDefinition.getName());
         oldFeatureDefinition.setFeatureGroup(featureGroup.get());
         if(givenNewValues != null) {
