@@ -262,7 +262,7 @@ public class ProductAndCategoryTests {
 //        urlParams = "";
 
         FilterParameters filterParameters = new FilterParameters(urlParams);
-        List<Product> all = productService.getProducts(categoryLogicSmartphones, filterParameters);
+        List<Product> all = productService.getProducts(categoryLogicSmartphones, filterParameters, "prc-desc");
 
         assertThat(all.size()).isEqualTo(1);
         assertThat(all.get(0).getFeatureBags().size()).isEqualTo(5);

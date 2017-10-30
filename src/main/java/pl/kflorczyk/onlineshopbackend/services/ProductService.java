@@ -1,12 +1,14 @@
 package pl.kflorczyk.onlineshopbackend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureBagDTO;
 import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
+import pl.kflorczyk.onlineshopbackend.product_filters.ProductSortTranslator;
 import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
 import pl.kflorczyk.onlineshopbackend.repositories.ProductRepository;
 import pl.kflorczyk.onlineshopbackend.validators.ProductValidator;
@@ -39,21 +41,23 @@ public class ProductService {
     }
 
     public List<Product> getProducts(long categoryID) {
-        return getProducts(categoryID, null);
+        return getProducts(categoryID, null, null);
     }
 
-    public List<Product> getProducts(long categoryID, FilterParameters parameters) {
-        return getProducts(categoryLogicRepository.findOne(categoryID), parameters);
+    public List<Product> getProducts(long categoryID, FilterParameters parameters, String sort) {
+        return getProducts(categoryLogicRepository.findOne(categoryID), parameters, sort);
     }
 
     public List<Product> getProducts(CategoryLogic categoryLogic) {
-        return getProducts(categoryLogic, null);
+        return getProducts(categoryLogic, null, null);
     }
 
-    public List<Product> getProducts(CategoryLogic categoryLogic, FilterParameters parameters) {
+    public List<Product> getProducts(CategoryLogic categoryLogic, FilterParameters parameters, String sortString) {
         if(categoryLogic == null) return null;
 
-        List<Product> received = productRepository.findByCategoryLogic(categoryLogic);
+        Sort sort = new ProductSortTranslator(sortString).translate();
+
+        List<Product> received = productRepository.findByCategoryLogic(categoryLogic, sort);
         List<Product> result;
 
         if(parameters != null && parameters.size() != 0) {

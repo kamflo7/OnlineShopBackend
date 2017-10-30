@@ -263,10 +263,11 @@ public class CategoryController {
     @GetMapping(path = "/categories/{categoryID}/products")
     public String getProducts(
             @PathVariable(name = "categoryID") long categoryID,
-            @RequestParam(name = "f", required = false) String filters
+            @RequestParam(name = "f", required = false) String filters,
+            @RequestParam(name = "s", required = false) String sort
     ) {
         FilterParameters filterParameters = new FilterParameters(filters == null ? "" : filters);
-        List<Product> products = productService.getProducts(categoryID, filterParameters);
+        List<Product> products = productService.getProducts(categoryID, filterParameters, sort);
 
         String result = null;
         try {

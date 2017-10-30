@@ -1,5 +1,6 @@
 package pl.kflorczyk.onlineshopbackend.repositories;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
 import pl.kflorczyk.onlineshopbackend.model.Product;
@@ -11,5 +12,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Product findFirst1ByNameIgnoreCase(String name);
 
-    List<Product> findByCategoryLogic(CategoryLogic categoryLogic);
+    List<Product> findByCategoryLogic(CategoryLogic categoryLogic, Sort sort);
 }
