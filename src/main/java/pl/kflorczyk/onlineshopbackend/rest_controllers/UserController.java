@@ -7,12 +7,14 @@ import pl.kflorczyk.onlineshopbackend.dto.PersonAddressDTO;
 import pl.kflorczyk.onlineshopbackend.dto.UserAddressDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.User;
+import pl.kflorczyk.onlineshopbackend.model.UserAddress;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.Response;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.ResponseDetail;
 import pl.kflorczyk.onlineshopbackend.services.JwtService;
 import pl.kflorczyk.onlineshopbackend.services.UserService;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -53,12 +55,13 @@ public class UserController {
     }
 
     @PutMapping(path = "/users/{userID}/addresses/person")
-    public Response createAddress(@PathVariable(name = "userID") long userID, @RequestBody PersonAddressDTO dto) {
+    public Response createAddressPerson(@PathVariable(name = "userID") long userID, @RequestBody PersonAddressDTO dto) {
+
         return createAddress(userID, dto);
     }
 
     @PutMapping(path = "/users/{userID}/addresses/company")
-    public Response createAddress(@PathVariable(name = "userID") long userID, @RequestBody CompanyAddressDTO dto) {
+    public Response createAddressCompany(@PathVariable(name = "userID") long userID, @RequestBody CompanyAddressDTO dto) {
         return createAddress(userID, dto);
     }
 
@@ -80,6 +83,11 @@ public class UserController {
             return new Response(Response.Status.FAILURE, e.getMessage());
         }
         return new Response(Response.Status.SUCCESS);
+    }
+
+    @GetMapping(path = "/users/{userID}/addresses")
+    public Response getAddresses(@PathVariable(name = "userID") long id) {
+        return new ResponseDetail<>(userService.getUserAddresses(id));
     }
 
     private Response createAddress(long userID, UserAddressDTO dto) {

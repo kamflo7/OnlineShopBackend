@@ -16,6 +16,8 @@ import pl.kflorczyk.onlineshopbackend.validators.EmailValidator;
 import pl.kflorczyk.onlineshopbackend.validators.PasswordValidator;
 import pl.kflorczyk.onlineshopbackend.validators.UserAddressValidator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -152,5 +154,14 @@ public class UserService {
 
         user.getAddresses().forEach(address -> address.setDefault(address.getID() == addressID));
         userRepository.saveAndFlush(user);
+    }
+
+    public List<UserAddress> getUserAddresses(long userID) {
+        User user = userRepository.findOne(userID);
+        if(user != null) {
+            return user.getAddresses();
+        } else {
+            return new ArrayList<>();
+        }
     }
 }
