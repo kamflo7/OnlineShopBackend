@@ -1,10 +1,13 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@JsonFilter("User")
 public class User {
     @Id
     @GeneratedValue
@@ -19,8 +22,8 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<UserAddress> addresses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<Order> orders;
+//    @OneToMany(mappedBy = "user")
+//    private List<Order> orders;
 
     public User() {}
 

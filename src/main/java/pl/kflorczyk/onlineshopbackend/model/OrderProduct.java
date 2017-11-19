@@ -17,4 +17,38 @@ public class OrderProduct {
     private int amount;
 
     //todo: statu
+
+
+    public OrderProduct() {
+    }
+
+    public OrderProduct(Product product, BigDecimal price, int amount) {
+        this.product = product;
+        this.price = price;
+        this.amount = amount;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
 }

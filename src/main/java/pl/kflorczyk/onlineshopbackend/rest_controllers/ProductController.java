@@ -27,14 +27,14 @@ public class ProductController {
 //        ArrayNode categories = node.putArray("products");
 //
 //
-////        List<Product> products =  productService.getProducts();
+//        List<Product> products =  productService.getProducts();
 //
-////        for(CategoryLogic categoryLogic : categoriesService.getCategories()) {
-////            ObjectNode jsonNode = categories.addObject();
-////            jsonNode.put("name", categoryLogic.getName());
-////            jsonNode.put("id", categoryLogic.getID());
-////            jsonNode.put("parent_id", categoryLogic.getParent() == null ? -1 : categoryLogic.getParent().getID());
-////        }
+//        for(CategoryLogic categoryLogic : categoriesService.getCategories()) {
+//            ObjectNode jsonNode = categories.addObject();
+//            jsonNode.put("name", categoryLogic.getName());
+//            jsonNode.put("id", categoryLogic.getID());
+//            jsonNode.put("parent_id", categoryLogic.getParent() == null ? -1 : categoryLogic.getParent().getID());
+//        }
 //
 //        return node.toString();
 //    }

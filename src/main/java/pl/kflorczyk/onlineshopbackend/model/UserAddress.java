@@ -32,6 +32,10 @@ public abstract class UserAddress {
         this.isDefault = isDefault;
     }
 
+    public void setID(long ID) {
+        this.ID = ID;
+    }
+
     public long getID() {
         return ID;
     }
