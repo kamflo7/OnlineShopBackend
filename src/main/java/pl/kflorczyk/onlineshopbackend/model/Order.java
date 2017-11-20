@@ -27,9 +27,6 @@ public class Order {
     @JoinColumn(name = "order_id")
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
-//    @Formula(value = "SELECT SUM(OrderProduct.price*OrderProduct.amount) WHERE OrderProduct.order_id = ID")
-//    private BigDecimal testTotalSum;
-
     @OneToOne
     @JoinColumn(name = "user_address_id")
     private UserAddress userAddress;
@@ -100,5 +97,9 @@ public class Order {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public long getID() {
+        return ID;
     }
 }

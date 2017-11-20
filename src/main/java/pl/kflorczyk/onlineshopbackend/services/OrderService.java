@@ -64,7 +64,7 @@ public class OrderService {
             throw new UserNotFoundException("User not found for given ID");
         }
 
-        return orderRepository.findByUser(user);
+        return orderRepository.findByUserOrderByIDDesc(user);
     }
 
     public Order getOrder(long orderID) {

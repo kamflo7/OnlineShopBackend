@@ -74,7 +74,7 @@ public class OrderController {
         User user = getUserFromAuthorizationToken(req.getHeader("Authorization"));
 
         if(user == null)
-            return mapToJSON(Claimant.MANY_ORDERS, new ResponseDetail<>("Not authorized"));
+            return mapToJSON(Claimant.SINGLE_ORDER, new ResponseDetail<>("Not authorized"));
 
         Order order = orderService.getOrder(orderID);
         if(order.getUser().getID() != user.getID())
