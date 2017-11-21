@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureBagDTO;
 import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
+import pl.kflorczyk.onlineshopbackend.dto.Tuple;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
@@ -34,6 +35,17 @@ public class ProductService {
     public ProductService(@Autowired ProductRepository productRepository, @Autowired CategoryLogicRepository categoryLogicRepository) {
         this.productRepository = productRepository;
         this.categoryLogicRepository = categoryLogicRepository;
+    }
+
+    public Tuple<BigDecimal> getPriceRange(long categoryID) {
+        CategoryLogic categoryLogic = categoryLogicRepository.findOne(categoryID);
+
+        if(categoryLogic == null)
+            return null;
+
+        Product lowestPrice = productRepository.findFirst1ByCategoryLogicOrderByPriceAsc(categoryLogic);
+        Product highestPrice = productRepository.findFirst1ByCategoryLogicOrderByPriceDesc(categoryLogic);
+        return new Tuple<>(lowestPrice.getPrice(), highestPrice.getPrice());
     }
 
     public Product getProduct(long productID) {

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTOEditable;
 import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
+import pl.kflorczyk.onlineshopbackend.dto.Tuple;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
 import pl.kflorczyk.onlineshopbackend.model.CategoryView;
@@ -20,6 +21,7 @@ import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.ResponseDetail;
 import pl.kflorczyk.onlineshopbackend.services.CategoryService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @RestController
@@ -287,6 +289,18 @@ public class CategoryController {
         return result;
     }
 
+    @GetMapping(path = "/categories/{categoryID}/products/price-range")
+    public String getProductsPriceRange(
+            @PathVariable(name = "categoryID") long categoryID
+    ) {
+        Tuple<BigDecimal> priceRange = productService.getPriceRange(categoryID);
+        if(priceRange == null) {
+            return mapToJSON(Claimant.EMPTY, new Response(Response.Status.FAILURE, "null"));
+        }
+
+        return mapToJSON(Claimant.EMPTY, new ResponseDetail<>(priceRange));
+    }
+
     @GetMapping(path = "/products/{productID}")
     public String getProduct(@PathVariable(name = "productID") long productID) {
         Product product = productService.getProduct(productID);
@@ -413,11 +427,14 @@ public class CategoryController {
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
                             "featureGroup", "categoryLogic", "featureValueDefinitions", "multipleValues", "filterable", "visible"))
                     .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll());
+        } else if(claimant == Claimant.EMPTY) {
+            return new SimpleFilterProvider();
         }
         return null;
     }
 
     private enum Claimant {
+        EMPTY,
         ONE_PRODUCT,
         MANY_PRODUCTS,
 
@@ -430,9 +447,10 @@ public class CategoryController {
     private String mapToJSON(Claimant claimant, Object valueToMap) {
         String result = null;
         try {
-            result = new ObjectMapper()
-                    .writer(getJSONFilters(claimant))
-                    .writeValueAsString(valueToMap);
+            if(claimant == null)
+                result = new ObjectMapper().writeValueAsString(valueToMap);
+            else
+                result = new ObjectMapper().writer(getJSONFilters(claimant)).writeValueAsString(valueToMap);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return "{\"status\": \"failure\", \"description\": \"internal error\"}";

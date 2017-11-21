@@ -13,4 +13,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Product findFirst1ByNameIgnoreCase(String name);
 
     List<Product> findByCategoryLogic(CategoryLogic categoryLogic, Sort sort);
+
+    Product findFirst1ByCategoryLogicOrderByPriceDesc(CategoryLogic categoryLogic);
+    Product findFirst1ByCategoryLogicOrderByPriceAsc(CategoryLogic categoryLogic);
 }
