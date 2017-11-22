@@ -153,18 +153,31 @@ public class CategoryController {
                 IncompatibleFeatureValueDefinitionAssignmentException e) {
             return mapToJSON(Claimant.CATEGORY_VIEW, new Response(Response.Status.FAILURE, e.getMessage()));
         }
-        return mapToJSON(Claimant.CATEGORY_VIEW, new ResponseDetail<CategoryView>(categoryView));
+        return mapToJSON(Claimant.CATEGORY_VIEW, new ResponseDetail<>(categoryView));
     }
 
     @PostMapping("/navigations/{id}")
     public String updateNavigation(
+        @PathVariable(name = "id") long navigationID,
         @RequestParam(name = "name") String name,
         @RequestParam(name = "parentID", required = false) Long parentID,
-        @RequestParam(name = "categoryLogicID", required = false) Long categoryLogicID,
-        @RequestBody(required = false) Map<Long, List<Long>> filters
+        @RequestParam(name = "categoryLogicID", required = false) Long categoryLogicID
+//        @RequestBody(required = false) Map<Long, List<Long>> filters
     ) {
-        // todo
-        return null;
+        CategoryView categoryView = null;
+        try {
+            categoryView = categoryService.editCategoryView(navigationID, name, parentID, categoryLogicID);
+        } catch(InvalidCategoryNameException | CategoryViewNotFoundException
+                | CategoryNotFoundException e) {
+            return mapToJSON(Claimant.CATEGORY_VIEW, new ResponseDetail<>(Response.Status.FAILURE, e.getMessage()));
+        }
+        return mapToJSON(Claimant.CATEGORY_VIEW, new ResponseDetail<>(categoryView));
+    }
+
+    @DeleteMapping("/navigations/{id}")
+    public String removeNavigation(@PathVariable(name = "id") long navigationID) {
+        int childrenAffected = categoryService.removeNavigation(navigationID);
+        return mapToJSON(Claimant.EMPTY, new Response(Response.Status.SUCCESS, "Children affected: " + childrenAffected));
     }
 
 // FeatureGroup section
@@ -299,6 +312,12 @@ public class CategoryController {
         }
 
         return mapToJSON(Claimant.EMPTY, new ResponseDetail<>(priceRange));
+    }
+
+    @GetMapping(path = "/products/search/{name}")
+    public String searchProductsByName(@PathVariable(name = "name") String name) {
+        List<Product> products = productService.searchByName(name);
+        return mapToJSON(Claimant.MANY_PRODUCTS, new ResponseDetail<>(products));
     }
 
     @GetMapping(path = "/products/{productID}")

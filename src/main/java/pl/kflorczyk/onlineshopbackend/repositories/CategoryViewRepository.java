@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CategoryViewRepository extends JpaRepository<CategoryView, Long> {
     List<CategoryView> findAll();
+
+    List<CategoryView> findByParent(CategoryView categoryView);
 }

@@ -14,12 +14,6 @@ import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
 import pl.kflorczyk.onlineshopbackend.repositories.ProductRepository;
 import pl.kflorczyk.onlineshopbackend.validators.ProductValidator;
 
-import javax.imageio.ImageIO;
-import javax.servlet.ServletContext;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -46,6 +40,10 @@ public class ProductService {
         Product lowestPrice = productRepository.findFirst1ByCategoryLogicOrderByPriceAsc(categoryLogic);
         Product highestPrice = productRepository.findFirst1ByCategoryLogicOrderByPriceDesc(categoryLogic);
         return new Tuple<>(lowestPrice.getPrice(), highestPrice.getPrice());
+    }
+
+    public List<Product> searchByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name);
     }
 
     public Product getProduct(long productID) {

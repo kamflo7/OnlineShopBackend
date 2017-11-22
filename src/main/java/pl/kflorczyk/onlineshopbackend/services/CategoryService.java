@@ -266,47 +266,59 @@ public class CategoryService {
             }
         }
 
-//        if(features != null && categoryLogicID == null) {
-//            throw new NullPointerException("If features are present, the categoryLogicID should also be present");
-//        }
-
-//        Map<FeatureDefinition, FeatureValueGroup> translatedMap = null;
-//        if(features != null) {
-//            try {
-//                translatedMap = translateNavigationFeaturesIndexesToEntities(features, categoryLogic);
-//            } catch (IncompatibleFeatureDefinitionAssignmentException | IncompatibleFeatureValueDefinitionAssignmentException e) {
-//                throw e;
-//            }
-//        }
-
         CategoryView categoryView = new CategoryView(name);
         categoryView.setParent(parent);
         categoryView.setCategoryLogic(categoryLogic);
-//        categoryView.setFilters(translatedMap);
 
         categoryViewRepository.saveAndFlush(categoryView);
         return categoryView;
     }
 
-//    private Map<FeatureDefinition, FeatureValueGroup> translateNavigationFeaturesIndexesToEntities(Map<Long, List<Long>> rawMap, CategoryLogic categoryLogic) {
-//        Map<FeatureDefinition, FeatureValueGroup> result = new HashMap<>();
-//        for(Map.Entry<Long, List<Long>> rawDefinitionIndex : rawMap.entrySet()) {
-//            Optional<FeatureDefinition> appropriateDef = categoryLogic.getFeatureDefinitions().stream().filter(f -> f.getId() == rawDefinitionIndex.getKey()).findAny();
-//            if(!appropriateDef.isPresent()) {
-//                throw new IncompatibleFeatureDefinitionAssignmentException("Incompatible filters in terms of CategoryLogic");
-//            }
-//
-//            List<FeatureValue> featureValues = new ArrayList<>();
-//            for(Long rawFeatureValue : rawDefinitionIndex.getValue()) {
-//                Optional<FeatureValue> appropriateValueDef = appropriateDef.get().getFeatureValueDefinitions().stream().filter(fv -> fv.getID() == rawFeatureValue).findAny();
-//                if(!appropriateValueDef.isPresent()) {
-//                    throw new IncompatibleFeatureValueDefinitionAssignmentException("Incompatible filters in terms of CategoryLogic");
-//                }
-//
-//                featureValues.add(appropriateValueDef.get());
-//            }
-//            result.put(appropriateDef.get(), new FeatureValueGroup(featureValues));
-//        }
-//        return result;
-//    }
+    public CategoryView editCategoryView(long navigationID, String name, long parentID, Long categoryLogicID) {
+        SimpleNameValidator validator = new SimpleNameValidator(2);
+        if(name == null || !validator.validate(name)) {
+            throw new InvalidCategoryNameException("Invalid name for category");
+        }
+
+        CategoryView categoryView = categoryViewRepository.findOne(navigationID);
+        if(categoryView == null) {
+            throw new CategoryViewNotFoundException("CategoryView not found for given ID");
+        }
+
+        CategoryView categoryViewParent = categoryViewRepository.findOne(parentID);
+        if(categoryViewParent == null) {
+            throw new CategoryViewNotFoundException("CategoryView (parent) not found for given ID");
+        }
+
+        CategoryLogic categoryLogic = null;
+        if(categoryLogicID != null) {
+            categoryLogic = categoryLogicRepository.findOne(categoryLogicID);
+
+            if(categoryLogic == null) {
+                throw new CategoryNotFoundException("CategoryLogic not found for given ID");
+            }
+        }
+
+        categoryView.setName(name);
+        categoryView.setCategoryLogic(categoryLogic);
+        categoryView.setParent(categoryViewParent);
+        categoryViewRepository.saveAndFlush(categoryView);
+        return categoryView;
+    }
+
+    public int removeNavigation(long navigationID) {
+        CategoryView categoryView = categoryViewRepository.findOne(navigationID);
+        if(categoryView == null) {
+            throw new CategoryViewNotFoundException("CategoryView not found for given ID");
+        }
+
+        List<CategoryView> potentialChildren = categoryViewRepository.findByParent(categoryView);
+        for(CategoryView child : potentialChildren) {
+            child.setParent(null);
+            categoryViewRepository.saveAndFlush(child);
+        }
+
+        categoryViewRepository.delete(categoryView);
+        return potentialChildren.size();
+    }
 }
