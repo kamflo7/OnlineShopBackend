@@ -5,8 +5,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import pl.kflorczyk.onlineshopbackend.model.User;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class JwtAuthenticatedProfile implements Authentication {
     private final User user;
@@ -17,7 +19,12 @@ public class JwtAuthenticatedProfile implements Authentication {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("USER"));
+
+        //Collections.singletonList(new SimpleGrantedAuthority("USER"));
+        if(user.isAdmin()) authorities.add(new SimpleGrantedAuthority("ADMIN"));
+        return authorities;
     }
 
     @Override

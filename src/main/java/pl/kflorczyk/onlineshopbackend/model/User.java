@@ -22,8 +22,7 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<UserAddress> addresses = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "user")
-//    private List<Order> orders;
+    private boolean isAdmin;
 
     public User() {}
 
@@ -31,6 +30,14 @@ public class User {
         this.ID = ID;
         this.email = email;
         this.password = password;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 
     public void addAddress(UserAddress userAddress) {

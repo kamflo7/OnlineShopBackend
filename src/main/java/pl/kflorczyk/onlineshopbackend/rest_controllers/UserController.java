@@ -90,6 +90,11 @@ public class UserController {
         return new ResponseDetail<>(userService.getUserAddresses(id));
     }
 
+    @GetMapping(path = "/am-i-admin")
+    public Response getAdminInfo() {
+        return new Response(Response.Status.SUCCESS, "Ofcourse if you see it!");
+    }
+
     private Response createAddress(long userID, UserAddressDTO dto) {
         try {
             userService.createUserAddress(userID, dto);
@@ -107,5 +112,6 @@ public class UserController {
         }
         return new Response(Response.Status.SUCCESS);
     }
+
 
 }
