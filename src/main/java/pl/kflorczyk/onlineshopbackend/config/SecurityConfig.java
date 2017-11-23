@@ -3,6 +3,7 @@ package pl.kflorczyk.onlineshopbackend.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,22 +42,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .cors()
                 .and()
             .authorizeRequests()
-                .antMatchers("/register").permitAll()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/categories").permitAll()
-                .antMatchers("/categories/**").permitAll()
-                .antMatchers("/products").permitAll()
-                .antMatchers("/products/**").permitAll()
-                .antMatchers("/users/**").permitAll()
-                .antMatchers("/resources/imgs/**").hasAuthority("USER")
-                .antMatchers("/navigations").permitAll()
-                .antMatchers("/navigations/**").permitAll()
-                .antMatchers("/orders").permitAll()
-                .antMatchers("/orders/**").permitAll()
-                .antMatchers("/authenticatedTestResource").hasAuthority("USER")
-                .antMatchers("/am-i-admin").hasAuthority("ADMIN")
-//                .antMatchers("/user/*", "/user", "/userlist").permitAll()
-//                .antMatchers("/admin").hasAuthority("ROLE_USER")
+                .antMatchers("/register", "/login").permitAll()
+                .antMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/navigations/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/products/**").permitAll()
+                .antMatchers("/resources/imgs/**").permitAll()
+
+                .antMatchers("/categories/**").hasAuthority("ADMIN")
+                .antMatchers("/products/**").hasAuthority("ADMIN")
+                .antMatchers("/navigations/**").hasAuthority("ADMIN")
+                .antMatchers("/am-i-admin/**").hasAuthority("ADMIN")
+
+                .antMatchers("/orders/**").hasAuthority("USER")
+                .antMatchers("/users/**").hasAuthority("USER")
                 .and()
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling()
