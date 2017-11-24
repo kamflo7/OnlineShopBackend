@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class JwtService {
     private static final String ISSUER = "onlineshop.app";
-    private final byte[] secretKey;
-    private UserRepository userRepository;
+    private final byte[] secretKey = "temporary solution xff".getBytes();
 
-    @Autowired
-    public JwtService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-        this.secretKey = "temporary solution xff".getBytes();
-    }
+    @NonNull private final UserRepository userRepository;
 
     public String tokenFor(User user) {
         Date expiration = DateTime.now(DateTimeZone.UTC).plusHours(2).toDate();

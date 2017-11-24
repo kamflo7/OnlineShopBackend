@@ -1,5 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.services;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
@@ -13,27 +15,15 @@ import pl.kflorczyk.onlineshopbackend.validators.*;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
 
-    private CategoryViewRepository categoryViewRepository;
-    private CategoryLogicRepository categoryLogicRepository;
+    @NonNull private final CategoryViewRepository categoryViewRepository;
+    @NonNull private final CategoryLogicRepository categoryLogicRepository;
 
-    private CategoryValidator categoryValidator;
-    private FeatureGroupValidator featureGroupValidator;
-    private SimpleNameValidator simpleNameValidator;
-
-    public CategoryService(@Autowired CategoryViewRepository categoryViewRepository,
-                           @Autowired CategoryLogicRepository categoryLogicRepository,
-                           @Autowired CategoryValidator categoryValidator,
-                           @Autowired FeatureGroupValidator featureGroupValidator,
-                           @Autowired SimpleNameValidator simpleNameValidator
-    ) {
-        this.categoryViewRepository = categoryViewRepository;
-        this.categoryLogicRepository = categoryLogicRepository;
-        this.categoryValidator = categoryValidator;
-        this.featureGroupValidator = featureGroupValidator;
-        this.simpleNameValidator = simpleNameValidator;
-    }
+    @NonNull private final CategoryValidator categoryValidator;
+    @NonNull private final FeatureGroupValidator featureGroupValidator;
+    @NonNull private final SimpleNameValidator simpleNameValidator;
 
     public List<CategoryView> getCategoriesViews() {
         return categoryViewRepository.findAll();

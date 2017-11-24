@@ -1,5 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.services;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -18,25 +20,14 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
 
-    private ProductRepository productRepository;
-    private CategoryLogicRepository categoryLogicRepository;
+    @NonNull private final ProductRepository productRepository;
+    @NonNull private final CategoryLogicRepository categoryLogicRepository;
 
-    private ProductValidator productValidator;
-
-    private ImageService imageService;
-
-    public ProductService(@Autowired ProductRepository productRepository,
-                          @Autowired CategoryLogicRepository categoryLogicRepository,
-                          @Autowired ProductValidator productValidator,
-                          @Autowired ImageService imageService
-    ) {
-        this.productRepository = productRepository;
-        this.categoryLogicRepository = categoryLogicRepository;
-        this.productValidator = productValidator;
-        this.imageService = imageService;
-    }
+    @NonNull private final ProductValidator productValidator;
+    @NonNull private final ImageService imageService;
 
     public Tuple<BigDecimal> getPriceRange(long categoryID) {
         CategoryLogic categoryLogic = categoryLogicRepository.findOne(categoryID);

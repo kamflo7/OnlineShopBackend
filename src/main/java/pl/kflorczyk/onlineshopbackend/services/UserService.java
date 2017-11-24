@@ -1,5 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.services;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,28 +28,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    @NonNull private UserRepository userRepository;
+    @NonNull private PasswordEncoder passwordEncoder;
 
-    private EmailValidator emailValidator;
-    private UserAddressValidator userAddressValidator;
+    @NonNull private EmailValidator emailValidator;
+    @NonNull private UserAddressValidator userAddressValidator;
 
-    private JwtService jwtService;
-
-    public UserService(@Autowired UserRepository userRepository,
-                       @Autowired PasswordEncoder passwordEncoder,
-                       @Autowired EmailValidator emailValidator,
-                       @Autowired UserAddressValidator userAddressValidator,
-                       @Autowired JwtService jwtService
-    ) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.emailValidator = emailValidator;
-        this.userAddressValidator = userAddressValidator;
-        this.jwtService = jwtService;
-    }
+    @NonNull private JwtService jwtService;
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

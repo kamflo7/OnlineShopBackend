@@ -1,5 +1,7 @@
 package pl.kflorczyk.onlineshopbackend.services;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,17 +19,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
-    private OrderRepository orderRepository;
-    private UserService userService;
-    private ProductService productService;
-
-    public OrderService(@Autowired OrderRepository orderRepository, @Autowired UserService userService, @Autowired ProductService productService) {
-        this.orderRepository = orderRepository;
-        this.userService = userService;
-        this.productService = productService;
-    }
+    @NonNull private final OrderRepository orderRepository;
+    @NonNull private final UserService userService;
+    @NonNull private final ProductService productService;
 
     public Order makeOrder(long addressID,
                            String deliveryMethod, String paymentMethod,

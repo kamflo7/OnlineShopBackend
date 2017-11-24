@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import pl.kflorczyk.onlineshopbackend.dto.OrderProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.ProductNotFoundException;
@@ -19,13 +22,11 @@ import pl.kflorczyk.onlineshopbackend.services.OrderService;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private JwtService jwtService;
+    @NonNull private final OrderService orderService;
+    @NonNull private final JwtService jwtService;
 
     @PutMapping(path = "/orders")
     public String createOrder(
