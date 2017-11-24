@@ -31,7 +31,6 @@ public class Order {
     @JoinColumn(name = "user_address_id")
     private UserAddress userAddress;
 
-    // don't have time to over complicate simple learning project
     private String deliveryMethod;
     private String paymentMethod;
 

@@ -14,7 +14,6 @@ import pl.kflorczyk.onlineshopbackend.services.JwtService;
 import pl.kflorczyk.onlineshopbackend.services.UserService;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 @RestController
 public class UserController {

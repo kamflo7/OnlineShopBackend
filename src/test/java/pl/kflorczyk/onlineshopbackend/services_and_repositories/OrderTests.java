@@ -76,7 +76,5 @@ public class OrderTests {
         }
 
         assertThat(order.getOrderProducts().size()).isEqualTo(2);
-
-
     }
 }

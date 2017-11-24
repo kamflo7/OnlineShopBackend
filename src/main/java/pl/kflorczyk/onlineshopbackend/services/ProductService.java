@@ -99,7 +99,7 @@ public class ProductService {
 
         for(FeatureBag featureBag : product.getFeatureBags()) {
             for(Map.Entry<FeatureDefinition, List<FeatureValue>> entry : givenFilters.entrySet()) {
-                if(entry.getKey().isDummyPriceFilter()) { // todo: dummy solution, don't have enough time, fix later
+                if(entry.getKey().isDummyPriceFilter()) {
                     BigDecimal min = new BigDecimal(entry.getValue().get(0).getValue());
                     BigDecimal max = new BigDecimal(entry.getValue().get(1).getValue());
 
@@ -111,8 +111,6 @@ public class ProductService {
 
                 if(entry.getKey().getId() == featureBag.getFeatureDefinition().getId()) {
                     if(featureBag.getFeatureDefinition().isMultipleValues()) {
-                        // Product has FeatureDef("Wireless connectivity") and its List<FeatureValue> has MANY elements
-                        // Filter has many elements
                         int matchParams = 0;
 
                         for(FeatureValue filterValue : entry.getValue()) {
@@ -126,8 +124,6 @@ public class ProductService {
                             return false;
                         }
                     } else {
-                        // Product has FeatureDef("RAM") and its List<FeatureValue> with one element
-                        // Filter has many elements
                         FeatureValue featureValue = featureBag.getFeatureValues().get(0);
                         List<FeatureValue> filterValues = entry.getValue();
 
@@ -196,7 +192,7 @@ public class ProductService {
 
         CategoryLogic categoryLogic = product.getCategoryLogic();
 
-        if(data.getName() != null) { // update name if present
+        if(data.getName() != null) {
             if(!productValidator.validateName(data.getName())) {
                 throw new InvalidProductNameException("Invalid product name");
             }
@@ -208,21 +204,21 @@ public class ProductService {
             product.setName(data.getName());
         }
 
-        if(data.getDescription() != null) { // update description if present
+        if(data.getDescription() != null) {
             if(!productValidator.validateDescription(data.getDescription())) {
                 throw new InvalidProductDescriptionException("Invalid product description");
             }
             product.setDescription(data.getDescription());
         }
 
-        if(data.getPrice() != null) // update price if present
+        if(data.getPrice() != null)
             product.setPrice(data.getPrice());
 
-        if(data.getAmount() != null) // update amount if present
+        if(data.getAmount() != null)
             product.setAmount(data.getAmount());
 
         Map<Long, List<Long>> rawFeatures = data.getFeatures();
-        if(rawFeatures != null) { // update feature values if present
+        if(rawFeatures != null) {
             List<FeatureBagDTO> realFeatureValues = convertProductRawDataToFeatureBagDTO(categoryLogic, rawFeatures);
             for(FeatureBagDTO featureBagDTO : realFeatureValues) {
                 Optional<FeatureBag> realFeatureBag = product.getFeatureBags().stream().filter(f -> f.getFeatureDefinition().getId() == featureBagDTO.getFeatureDefinition().getId()).findAny();
@@ -235,11 +231,11 @@ public class ProductService {
         }
 
         if(data.getImage() != null) {
-            if(product.getImage() != null) { // already has Image, so edit
+            if(product.getImage() != null) {
                 String imageName = product.getImage().getName();
                 imageService.replaceImageBase64OnDisk(data.getImage(), imageName);
                 productRepository.saveAndFlush(product);
-            } else {                        // create new image
+            } else {
                 product.setImage(new Image());
                 productRepository.saveAndFlush(product);
                 imageService.saveImageBase64OnDisk(data.getImage(), product.getImage().getName());

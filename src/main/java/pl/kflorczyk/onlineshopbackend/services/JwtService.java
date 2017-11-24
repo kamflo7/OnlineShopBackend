@@ -29,10 +29,7 @@ public class JwtService {
     }
 
     public String tokenFor(User user) {
-//        Date expiration = Date.from(LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.UTC));
         Date expiration = DateTime.now(DateTimeZone.UTC).plusHours(2).toDate();
-
-        //{sub: "ja@gmail.com", jti: "1", exp: 1511464108, iss: "onlineshop.app"}
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", user.getEmail());
@@ -45,14 +42,6 @@ public class JwtService {
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
-
-//        return Jwts.builder()
-//                .setSubject(user.getEmail())
-//                .setId(user.getID()+"")
-//                .setExpiration(expiration)
-//                .setIssuer(ISSUER)
-//                .signWith(SignatureAlgorithm.HS512, secretKey)
-//                .compact();
     }
 
     public User verify(String token) throws IOException, URISyntaxException {

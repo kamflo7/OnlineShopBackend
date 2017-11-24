@@ -24,7 +24,7 @@ public class FilterParametersURLConverter {
             String[] parts = filter.split("-");
             if(parts.length != 2) continue;
 
-            if(parts[0].equals(FilterParameters.FILTER_PRICE)) { // todo: dummy solution, don't have enough time, fix later
+            if(parts[0].equals(FilterParameters.FILTER_PRICE)) {
                 String[] values = parts[1].split("_");
                 if(values.length != 2) continue;
 

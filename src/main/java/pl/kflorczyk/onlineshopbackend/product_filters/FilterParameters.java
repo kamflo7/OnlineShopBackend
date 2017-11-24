@@ -21,7 +21,6 @@ public class FilterParameters {
         this.map = converter.convert();
     }
 
-    //todo: Maybe check if user adds multiple value to FeatureDefinition that consists only of one value?
     public void addFilterValue(FeatureDefinition featureDefinition, FeatureValue featureValue) {
         if(!map.containsKey(featureDefinition)) {
             map.put(featureDefinition, new ArrayList<>());

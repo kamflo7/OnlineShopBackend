@@ -19,12 +19,10 @@ public class ProductSortTranslator {
             return null;
 
         String[] parts = sortRaw.split(DELIMITER);
-        if(parts.length == 2) {
-            if(parts[0].equals(PRICE)) {
-                Sort.Direction direction = parts[1].equals(ASC) ? Sort.Direction.ASC : Sort.Direction.DESC;
-                Sort sort = new Sort(direction, "price");
-                return sort;
-            }
+        if(parts.length == 2 && parts[0].equals(PRICE)) {
+            Sort.Direction direction = parts[1].equals(ASC) ? Sort.Direction.ASC : Sort.Direction.DESC;
+            Sort sort = new Sort(direction, "price");
+            return sort;
         }
         return null;
     }

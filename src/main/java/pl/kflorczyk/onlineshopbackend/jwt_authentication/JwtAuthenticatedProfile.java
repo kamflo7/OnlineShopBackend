@@ -22,7 +22,6 @@ public class JwtAuthenticatedProfile implements Authentication {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("USER"));
 
-        //Collections.singletonList(new SimpleGrantedAuthority("USER"));
         if(user.isAdmin()) authorities.add(new SimpleGrantedAuthority("ADMIN"));
         return authorities;
     }

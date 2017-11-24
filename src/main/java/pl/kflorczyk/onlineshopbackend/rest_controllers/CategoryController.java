@@ -140,7 +140,6 @@ public class CategoryController {
             @RequestParam(name = "name") String name,
             @RequestParam(name = "parentID", required = false) Long parentID,
             @RequestParam(name = "categoryLogicID", required = false) Long categoryLogicID
-//            @RequestBody(required = false) Map<Long, List<Long>> filters
     ) {
         CategoryView categoryView = null;
         try {
@@ -162,7 +161,6 @@ public class CategoryController {
         @RequestParam(name = "name") String name,
         @RequestParam(name = "parentID", required = false) Long parentID,
         @RequestParam(name = "categoryLogicID", required = false) Long categoryLogicID
-//        @RequestBody(required = false) Map<Long, List<Long>> filters
     ) {
         CategoryView categoryView = null;
         try {
@@ -215,8 +213,7 @@ public class CategoryController {
     public String createProduct(
         @PathVariable(name = "categoryID") long categoryID,
         @RequestBody ProductDTO productDTO
-    ) { // not the shortest method because returned type has been changed from ResponseType<T> to String
-        // in case of sudden neccessary use @JsonFilters
+    ) {
         Product product = null;
 
         try {

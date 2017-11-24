@@ -16,8 +16,6 @@ public class OrderProduct {
     private BigDecimal price;
     private int amount;
 
-    //todo: statu
-
 
     public OrderProduct() {
     }
