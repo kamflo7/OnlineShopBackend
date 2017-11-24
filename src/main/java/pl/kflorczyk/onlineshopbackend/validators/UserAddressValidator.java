@@ -5,13 +5,8 @@ import pl.kflorczyk.onlineshopbackend.dto.PersonAddressDTO;
 import pl.kflorczyk.onlineshopbackend.dto.UserAddressDTO;
 
 public class UserAddressValidator {
-    private UserAddressDTO userAddressDTO;
 
-    public UserAddressValidator(UserAddressDTO userAddressDTO) {
-        this.userAddressDTO = userAddressDTO;
-    }
-
-    public boolean validate() {
+    public boolean validate(UserAddressDTO userAddressDTO) {
         if(userAddressDTO.getCity() == null || userAddressDTO.getCity().isEmpty()) return false;
         if(userAddressDTO.getHouseNumber() <= 0) return false;
         if(userAddressDTO.getZipCode() == null) return false; // it's just a simple CRUD app so this enough

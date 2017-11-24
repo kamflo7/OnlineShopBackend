@@ -1,11 +1,12 @@
 package pl.kflorczyk.onlineshopbackend.validators;
 
+import java.util.Optional;
+
 public class FeatureDefinitionValidator {
 
     public boolean validate(String featureDefinitionName) {
-        if(featureDefinitionName != null && featureDefinitionName.length() > 3) {
-            return true;
-        }
-        return false;
+        return Optional.ofNullable(featureDefinitionName)
+                .filter(c -> c.length() >= 3)
+                .isPresent();
     }
 }

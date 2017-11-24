@@ -23,12 +23,19 @@ public class ProductService {
     private ProductRepository productRepository;
     private CategoryLogicRepository categoryLogicRepository;
 
-    @Autowired
+    private ProductValidator productValidator;
+
     private ImageService imageService;
 
-    public ProductService(@Autowired ProductRepository productRepository, @Autowired CategoryLogicRepository categoryLogicRepository) {
+    public ProductService(@Autowired ProductRepository productRepository,
+                          @Autowired CategoryLogicRepository categoryLogicRepository,
+                          @Autowired ProductValidator productValidator,
+                          @Autowired ImageService imageService
+    ) {
         this.productRepository = productRepository;
         this.categoryLogicRepository = categoryLogicRepository;
+        this.productValidator = productValidator;
+        this.imageService = imageService;
     }
 
     public Tuple<BigDecimal> getPriceRange(long categoryID) {
@@ -137,10 +144,9 @@ public class ProductService {
     }
 
     private Product createProduct(CategoryLogic categoryLogic, String name, String description, BigDecimal price, int amount, List<FeatureBagDTO> features, String image) {
-        ProductValidator validator = new ProductValidator(name, description);
-        if(!validator.validateName()) {
+        if(!productValidator.validateName(name)) {
             throw new InvalidProductNameException("Invalid product name");
-        } else if(!validator.validateDescription()) {
+        } else if(!productValidator.validateDescription(description)) {
             throw new InvalidProductDescriptionException("Invalid product description");
         }
 
@@ -189,10 +195,9 @@ public class ProductService {
             throw new ProductNotFoundException("Product not found for given id");
 
         CategoryLogic categoryLogic = product.getCategoryLogic();
-        ProductValidator validator = new ProductValidator(data.getName(), data.getDescription());
 
         if(data.getName() != null) { // update name if present
-            if(!validator.validateName()) {
+            if(!productValidator.validateName(data.getName())) {
                 throw new InvalidProductNameException("Invalid product name");
             }
 
@@ -204,7 +209,7 @@ public class ProductService {
         }
 
         if(data.getDescription() != null) { // update description if present
-            if(!validator.validateDescription()) {
+            if(!productValidator.validateDescription(data.getDescription())) {
                 throw new InvalidProductDescriptionException("Invalid product description");
             }
             product.setDescription(data.getDescription());
@@ -254,7 +259,6 @@ public class ProductService {
             FeatureBagDTO featureBagDTO = null;
             FeatureDefinition featureDefinition = null;
 
-            // #1 - look for appropriate FeatureDefinition by given ID
             for(FeatureDefinition featureDef : featureDefinitions) {
                 if(featureDef.getId() == givenFeature.getKey().longValue()) {
                     found = true;
@@ -268,7 +272,6 @@ public class ProductService {
                 throw new IncompatibleFeatureDefinitionAssignmentException("Given FeatureDefinition not found for given CategoryLogic");
             }
 
-            // #2 - look for appropriate FeatureValue's by given IDs for particular FeatureDefinition
             List<FeatureValue> featureValueDefinitions = featureDefinition.getFeatureValueDefinitions();
             for(Long givenFeatureValue : givenFeature.getValue()) {
                 boolean foundValue = false;

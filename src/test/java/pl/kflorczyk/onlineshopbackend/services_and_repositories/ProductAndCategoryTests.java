@@ -1,4 +1,4 @@
-package pl.kflorczyk.onlineshopbackend.servicesAndRepositories;
+package pl.kflorczyk.onlineshopbackend.services_and_repositories;
 
 import org.assertj.core.util.Lists;
 import org.junit.Before;
@@ -18,10 +18,14 @@ import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
 import pl.kflorczyk.onlineshopbackend.repositories.CategoryViewRepository;
 import pl.kflorczyk.onlineshopbackend.repositories.ProductRepository;
 import pl.kflorczyk.onlineshopbackend.services.CategoryService;
+import pl.kflorczyk.onlineshopbackend.services.ImageService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
+import pl.kflorczyk.onlineshopbackend.validators.CategoryValidator;
+import pl.kflorczyk.onlineshopbackend.validators.FeatureGroupValidator;
+import pl.kflorczyk.onlineshopbackend.validators.ProductValidator;
+import pl.kflorczyk.onlineshopbackend.validators.SimpleNameValidator;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +51,10 @@ public class ProductAndCategoryTests {
 
     @Before
     public void setup() {
-        categoryService = new CategoryService(categoryViewRepository, categoryLogicRepository);
+        categoryService = new CategoryService(categoryViewRepository, categoryLogicRepository,
+                new CategoryValidator(), new FeatureGroupValidator(), new SimpleNameValidator());
+
+        productService = new ProductService(productRepository, categoryLogicRepository, new ProductValidator(), new ImageService());
     }
 
     public void setupDatabaseStructure() {
@@ -132,7 +139,7 @@ public class ProductAndCategoryTests {
         try {
             CategoryLogic smartfony2 = categoryService.createNewCategory("Smartfony");
         } catch(CategoryAlreadyExistsException e) {
-            exceptions++;   // not found opposite method to junit.fail()
+            exceptions++;
         }
 
         try {
@@ -252,14 +259,9 @@ public class ProductAndCategoryTests {
         setupDatabaseStructure();
         setupDatabaseContent();
 
-        productService = new ProductService(productRepository, categoryLogicRepository);
-
-        // pure filter params in URL
         String urlParams = String.format("%d-%d,%d-%d.%d.%d,prc-100.0_5000.0",
                 featureDefRAM.getId(), ram6GB.getID(),
                 featureDefConnection.getId(), connWifi.getID(), connBt42.getID(), connNfc.getID());
-
-//        urlParams = "";
 
         FilterParameters filterParameters = new FilterParameters(urlParams);
         List<Product> all = productService.getProducts(categoryLogicSmartphones, filterParameters, "prc-desc");
@@ -284,9 +286,6 @@ public class ProductAndCategoryTests {
         CategoryView android = new CategoryView("Android");
         android.setCategoryLogic(categoryLogicSmartphones);
         android.setParent(smartfony);
-//        Map<FeatureDefinition, FeatureValueGroup> map = new HashMap<>();
-//        map.put(featureDefRAM, new FeatureValueGroup(Lists.newArrayList(ram2GB, ram4GB)));
-//        android.setFilters(map);
         categoryViewRepository.saveAndFlush(android);
     }
 
@@ -295,24 +294,16 @@ public class ProductAndCategoryTests {
         setupDatabaseStructure();
         setupDatabaseContent();
 
-        // root category
         CategoryView categoryRoot = categoryService.createCategoryView("Telefony i GSM", null, null);
 
-        // typical category
         CategoryView categorySmartphones = categoryService.createCategoryView("Smartfony", categoryRoot.getId(), categoryLogicSmartphones.getID());
 
-        // special category with filters
-//        Map<Long, List<Long>> filters = new HashMap<>();
-//        filters.put(featureDefRAM.getId(), Lists.newArrayList(ram2GB.getID(), ram4GB.getID()));
-//        CategoryView categoryFilters = categoryService.createCategoryView("Ram below 4GB", categorySmartphones.getId(), categoryLogicSmartphones.getID(), filters);
-        // todo: test is OK, add asserts later
         assertThat(categorySmartphones.getCategoryLogic().getID()).isEqualTo(categoryLogicSmartphones.getID());
     }
 
     @Test
     public void createProduct() {
         setupDatabaseStructure();
-        productService = new ProductService(productRepository, categoryLogicRepository);
 
         Map<Long, List<Long>> features = new HashMap<>();
         features.put(featureDefRAM.getId(), Lists.newArrayList(ram4GB.getID()));
@@ -347,7 +338,6 @@ public class ProductAndCategoryTests {
     @Test
     public void editProduct() {
         setupDatabaseStructure();
-        productService = new ProductService(productRepository, categoryLogicRepository);
 
         ProductDTO givenCreatingDTO = new ProductDTO("Huawei Testowy", "Spoko telefon", new BigDecimal("1000.00"), 100);
         Map<Long, List<Long>> givenCreatingFeatures = new HashMap<>();
@@ -364,7 +354,6 @@ public class ProductAndCategoryTests {
             fail("Should not throw RuntimeException [creating]: " + e.getMessage());
         }
 
-        // edit:
         ProductDTO givenEditDTO = new ProductDTO();
         givenEditDTO.setDescription("Zmiana opisu telefonu");
         givenEditDTO.setPrice(new BigDecimal("2000.00"));
@@ -392,7 +381,6 @@ public class ProductAndCategoryTests {
     @Test
     public void shouldCorrectlyValidateAndTranslateGivenLongIndexesToBussinessLogic() {
         setupDatabaseStructure();
-        productService = new ProductService(productRepository, categoryLogicRepository);
 
         Map<Long, List<Long>> setupFeatures = new HashMap<>();
         setupFeatures.put(featureDefRAM.getId(), Lists.newArrayList(ram2GB.getID()));

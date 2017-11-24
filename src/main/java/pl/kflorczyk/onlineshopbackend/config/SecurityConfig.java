@@ -17,6 +17,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.kflorczyk.onlineshopbackend.jwt_authentication.JwtAuthFilter;
 import pl.kflorczyk.onlineshopbackend.jwt_authentication.JwtAuthenticationEntryPoint;
 import pl.kflorczyk.onlineshopbackend.jwt_authentication.JwtAuthenticationProvider;
+import pl.kflorczyk.onlineshopbackend.validators.*;
 
 import java.util.Arrays;
 
@@ -32,9 +33,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthEndPoint;
-
-    public SecurityConfig() {
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -84,5 +82,45 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder(11);
+    }
+
+    @Bean
+    public CategoryValidator categoryValidator() {
+        return new CategoryValidator();
+    }
+
+    @Bean
+    public FeatureGroupValidator featureGroupValidator() {
+        return new FeatureGroupValidator();
+    }
+
+    @Bean
+    public EmailValidator emailValidator() {
+        return new EmailValidator();
+    }
+
+    @Bean
+    public FeatureDefinitionValidator featureDefinitionValidator() {
+        return new FeatureDefinitionValidator();
+    }
+
+    @Bean
+    public PasswordValidator passwordValidator() {
+        return new PasswordValidator();
+    }
+
+    @Bean
+    public ProductValidator productValidator() {
+        return new ProductValidator();
+    }
+
+    @Bean
+    public SimpleNameValidator simpleNameValidator() {
+        return new SimpleNameValidator();
+    }
+
+    @Bean
+    public UserAddressValidator userAddressValidator() {
+        return new UserAddressValidator();
     }
 }

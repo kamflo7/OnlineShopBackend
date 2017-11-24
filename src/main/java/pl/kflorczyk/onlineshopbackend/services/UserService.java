@@ -26,9 +26,18 @@ public class UserService {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
 
-    public UserService(@Autowired  UserRepository userRepository, @Autowired  PasswordEncoder passwordEncoder) {
+    private EmailValidator emailValidator;
+    private UserAddressValidator userAddressValidator;
+
+    public UserService(@Autowired UserRepository userRepository,
+                       @Autowired PasswordEncoder passwordEncoder,
+                       @Autowired EmailValidator emailValidator,
+                       @Autowired UserAddressValidator userAddressValidator
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailValidator = emailValidator;
+        this.userAddressValidator = userAddressValidator;
     }
 
     private boolean userExists(String email) {
@@ -48,7 +57,7 @@ public class UserService {
             throw new EmailAlreadyExistsException("Email already exists");
         }
 
-        if(!new EmailValidator().validate(email)) {
+        if(!emailValidator.validate(email)) {
             throw new InvalidEmailException("Invalid email");
         }
 
@@ -90,7 +99,7 @@ public class UserService {
             throw new NullPointerException("UserAddressDTO is null");
         }
 
-        if(!new UserAddressValidator(addressDTO).validate()) {
+        if(!userAddressValidator.validate(addressDTO)) {
             throw new InvalidAddressException("Invalid address");
         }
 
@@ -115,7 +124,7 @@ public class UserService {
             throw new NullPointerException("UserAddressDTO is null");
         }
 
-        if(!new UserAddressValidator(addressDTO).validate()) {
+        if(!userAddressValidator.validate(addressDTO)) {
             throw new InvalidAddressException("Invalid address");
         }
 

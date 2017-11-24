@@ -1,5 +1,6 @@
 package pl.kflorczyk.onlineshopbackend.validators;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,10 +9,8 @@ public class EmailValidator {
             Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     public boolean validate(String email) {
-        if(email == null || email.length() == 0)
-            return false;
-
-        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(email);
-        return matcher.find();
+        return Optional.ofNullable(email)
+                    .map(e -> VALID_EMAIL_ADDRESS_REGEX.matcher(e).find())
+                    .orElse(false);
     }
 }

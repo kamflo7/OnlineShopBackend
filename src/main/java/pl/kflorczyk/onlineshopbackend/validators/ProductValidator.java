@@ -1,21 +1,18 @@
 package pl.kflorczyk.onlineshopbackend.validators;
 
+import java.util.Optional;
+
 public class ProductValidator {
 
-    private String name, description;
-
-    public ProductValidator(String name, String description) {
-        this.name = name;
-        this.description = description;
+    public boolean validateName(String name) {
+        return Optional.ofNullable(name)
+                .filter(c -> c.length() >= 3)
+                .isPresent();
     }
 
-    public boolean validateName() {
-        if(name == null || name.length() < 3)
-            return false;
-        return true;
-    }
-
-    public boolean validateDescription() {
-        return true;
+    public boolean validateDescription(String description) {
+        return Optional.ofNullable(description)
+                .filter(c -> c.length() >= 6)
+                .isPresent();
     }
 }

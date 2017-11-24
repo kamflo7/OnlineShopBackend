@@ -1,4 +1,4 @@
-package pl.kflorczyk.onlineshopbackend.servicesAndRepositories;
+package pl.kflorczyk.onlineshopbackend.services_and_repositories;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +16,8 @@ import pl.kflorczyk.onlineshopbackend.model.User;
 import pl.kflorczyk.onlineshopbackend.model.UserAddress;
 import pl.kflorczyk.onlineshopbackend.repositories.UserRepository;
 import pl.kflorczyk.onlineshopbackend.services.UserService;
+import pl.kflorczyk.onlineshopbackend.validators.EmailValidator;
+import pl.kflorczyk.onlineshopbackend.validators.UserAddressValidator;
 
 import java.util.List;
 
@@ -36,7 +38,7 @@ public class UserServiceAndRepositoryTests {
 
     @Before
     public void setup() {
-        userService = new UserService(userRepository, passwordEncoder);
+        userService = new UserService(userRepository, passwordEncoder, new EmailValidator(), new UserAddressValidator());
         passwordEncoder = new BCryptPasswordEncoder(11);
     }
 

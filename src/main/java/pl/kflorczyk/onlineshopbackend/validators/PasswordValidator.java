@@ -1,8 +1,12 @@
 package pl.kflorczyk.onlineshopbackend.validators;
 
+import java.util.Optional;
+
 public class PasswordValidator {
 
     public boolean validate(String password) {
-        return password != null && password.length() >= 6;
+        return Optional.ofNullable(password)
+                .filter(c -> c.length() >= 6)
+                .isPresent();
     }
 }

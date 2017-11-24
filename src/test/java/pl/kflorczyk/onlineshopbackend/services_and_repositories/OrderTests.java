@@ -1,18 +1,15 @@
-package pl.kflorczyk.onlineshopbackend.servicesAndRepositories;
+package pl.kflorczyk.onlineshopbackend.services_and_repositories;
 
-import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.kflorczyk.onlineshopbackend.dto.OrderProductDTO;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.repositories.OrderRepository;
-import pl.kflorczyk.onlineshopbackend.repositories.ProductRepository;
 import pl.kflorczyk.onlineshopbackend.services.OrderService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 import pl.kflorczyk.onlineshopbackend.services.UserService;

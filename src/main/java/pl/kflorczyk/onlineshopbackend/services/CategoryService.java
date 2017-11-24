@@ -8,10 +8,7 @@ import pl.kflorczyk.onlineshopbackend.exceptions.*;
 import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
 import pl.kflorczyk.onlineshopbackend.repositories.CategoryViewRepository;
-import pl.kflorczyk.onlineshopbackend.validators.CategoryValidator;
-import pl.kflorczyk.onlineshopbackend.validators.FeatureDefinitionValidator;
-import pl.kflorczyk.onlineshopbackend.validators.FeatureGroupValidator;
-import pl.kflorczyk.onlineshopbackend.validators.SimpleNameValidator;
+import pl.kflorczyk.onlineshopbackend.validators.*;
 
 import java.util.*;
 
@@ -21,9 +18,21 @@ public class CategoryService {
     private CategoryViewRepository categoryViewRepository;
     private CategoryLogicRepository categoryLogicRepository;
 
-    public CategoryService(@Autowired CategoryViewRepository categoryViewRepository, @Autowired CategoryLogicRepository categoryLogicRepository) {
+    private CategoryValidator categoryValidator;
+    private FeatureGroupValidator featureGroupValidator;
+    private SimpleNameValidator simpleNameValidator;
+
+    public CategoryService(@Autowired CategoryViewRepository categoryViewRepository,
+                           @Autowired CategoryLogicRepository categoryLogicRepository,
+                           @Autowired CategoryValidator categoryValidator,
+                           @Autowired FeatureGroupValidator featureGroupValidator,
+                           @Autowired SimpleNameValidator simpleNameValidator
+    ) {
         this.categoryViewRepository = categoryViewRepository;
         this.categoryLogicRepository = categoryLogicRepository;
+        this.categoryValidator = categoryValidator;
+        this.featureGroupValidator = featureGroupValidator;
+        this.simpleNameValidator = simpleNameValidator;
     }
 
     public List<CategoryView> getCategoriesViews() {
@@ -41,7 +50,7 @@ public class CategoryService {
     }
 
     public CategoryLogic createNewCategory(String categoryName) {
-        if(!new CategoryValidator().validate(categoryName)) {
+        if(!categoryValidator.validate(categoryName)) {
             throw new InvalidCategoryNameException("Invalid name");
         }
 
@@ -56,7 +65,7 @@ public class CategoryService {
     }
 
     public CategoryLogic createFeatureGroup(String name, CategoryLogic categoryLogic) {
-        if(!new FeatureGroupValidator().validate(name)) {
+        if(!featureGroupValidator.validate(name)) {
             throw new InvalidFeatureGroupNameException("Invalid name");
         }
 
@@ -90,9 +99,8 @@ public class CategoryService {
             throw new FeatureDefinitionAlreadyExists("The given name for FeatureDefinition is already taken");
         }
 
-        SimpleNameValidator validator = new SimpleNameValidator(3);
         featureDefinitionDTO.getNewValues().stream().forEach(f -> {
-            if(!validator.validate(f)) {
+            if(!simpleNameValidator.validate(f, 3)) {
                 throw new InvalidFeatureValueDefinitionException("Invalid value for FeatureValue");
             }
         });
@@ -167,10 +175,9 @@ public class CategoryService {
 
         Map<Long, String> givenNewValues = newFeatureDefinition.getValues();
 
-        SimpleNameValidator validator = new SimpleNameValidator(3);
         if(givenNewValues != null) {
             givenNewValues.forEach((k, v) -> {
-                if (!validator.validate(v)) {
+                if (!simpleNameValidator.validate(v, 1)) {
                     throw new InvalidFeatureValueDefinitionException("Invalid value for FeatureValue");
                 }
             });
@@ -179,7 +186,7 @@ public class CategoryService {
         List<String> additionalNewValues = newFeatureDefinition.getNewValues();
         if(additionalNewValues != null) {
             additionalNewValues.forEach(v -> {
-                if (!validator.validate(v)) {
+                if (!simpleNameValidator.validate(v, 1)) {
                     throw new InvalidFeatureValueDefinitionException("Invalid value for FeatureValue");
                 }
             });
@@ -244,8 +251,7 @@ public class CategoryService {
     }
 
     public CategoryView createCategoryView(String name, Long parentID, Long categoryLogicID) {
-        SimpleNameValidator validator = new SimpleNameValidator(2);
-        if(name == null || !validator.validate(name)) {
+        if(name == null || !simpleNameValidator.validate(name, 2)) {
             throw new InvalidCategoryNameException("Invalid name for category");
         }
 
@@ -275,8 +281,7 @@ public class CategoryService {
     }
 
     public CategoryView editCategoryView(long navigationID, String name, long parentID, Long categoryLogicID) {
-        SimpleNameValidator validator = new SimpleNameValidator(2);
-        if(name == null || !validator.validate(name)) {
+        if(!simpleNameValidator.validate(name, 2)) {
             throw new InvalidCategoryNameException("Invalid name for category");
         }
 
