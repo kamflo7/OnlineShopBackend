@@ -1,12 +1,15 @@
 package pl.kflorczyk.onlineshopbackend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.kflorczyk.onlineshopbackend.dto.CompanyAddressDTO;
 import pl.kflorczyk.onlineshopbackend.dto.PersonAddressDTO;
 import pl.kflorczyk.onlineshopbackend.dto.UserAddressDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
+import pl.kflorczyk.onlineshopbackend.jwt_authentication.JwtAuthToken;
 import pl.kflorczyk.onlineshopbackend.model.CompanyAddress;
 import pl.kflorczyk.onlineshopbackend.model.PersonAddress;
 import pl.kflorczyk.onlineshopbackend.model.User;
@@ -16,6 +19,8 @@ import pl.kflorczyk.onlineshopbackend.validators.EmailValidator;
 import pl.kflorczyk.onlineshopbackend.validators.PasswordValidator;
 import pl.kflorczyk.onlineshopbackend.validators.UserAddressValidator;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,15 +34,31 @@ public class UserService {
     private EmailValidator emailValidator;
     private UserAddressValidator userAddressValidator;
 
+    private JwtService jwtService;
+
     public UserService(@Autowired UserRepository userRepository,
                        @Autowired PasswordEncoder passwordEncoder,
                        @Autowired EmailValidator emailValidator,
-                       @Autowired UserAddressValidator userAddressValidator
+                       @Autowired UserAddressValidator userAddressValidator,
+                       @Autowired JwtService jwtService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailValidator = emailValidator;
         this.userAddressValidator = userAddressValidator;
+        this.jwtService = jwtService;
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = null;
+        try {
+            user = jwtService.verify((JwtAuthToken) authentication);
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return user;
     }
 
     private boolean userExists(String email) {

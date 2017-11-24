@@ -7,8 +7,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import pl.kflorczyk.onlineshopbackend.jwt_authentication.JwtAuthToken;
 import pl.kflorczyk.onlineshopbackend.model.User;
+import pl.kflorczyk.onlineshopbackend.repositories.UserRepository;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -20,11 +23,11 @@ import java.util.Map;
 public class JwtService {
     private static final String ISSUER = "onlineshop.app";
     private final byte[] secretKey;
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
-    public JwtService(UserService userService) {
-        this.userService = userService;
+    public JwtService(UserRepository userRepository) {
+        this.userRepository = userRepository;
         this.secretKey = "temporary solution xff".getBytes();
     }
 
@@ -46,6 +49,10 @@ public class JwtService {
 
     public User verify(String token) throws IOException, URISyntaxException {
         Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-        return userService.getUser(claims.getBody().getSubject());
+        return userRepository.findByEmail(claims.getBody().getSubject());
+    }
+
+    public User verify(JwtAuthToken jwtAuthToken) throws IOException, URISyntaxException {
+        return verify(jwtAuthToken.getToken());
     }
 }

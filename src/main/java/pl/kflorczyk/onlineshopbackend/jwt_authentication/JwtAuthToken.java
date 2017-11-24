@@ -47,4 +47,8 @@ public class JwtAuthToken implements Authentication {
     public String getName() {
         return null;
     }
+
+    public String getToken() {
+        return token;
+    }
 }

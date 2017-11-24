@@ -1,6 +1,8 @@
 package pl.kflorczyk.onlineshopbackend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import pl.kflorczyk.onlineshopbackend.dto.OrderProductDTO;
 import pl.kflorczyk.onlineshopbackend.exceptions.ProductNotFoundException;
@@ -27,13 +29,13 @@ public class OrderService {
         this.productService = productService;
     }
 
-    public Order makeOrder(long userID, long addressID,
+    public Order makeOrder(long addressID,
                            String deliveryMethod, String paymentMethod,
                            List<OrderProductDTO> productsDTO) {
 
-        User user = userService.getUser(userID);
+        User user = userService.getCurrentUser();
         if(user == null) {
-            throw new UserNotFoundException("User not found for given ID");
+            throw new UserNotFoundException("User not found");
         }
 
         Optional<UserAddress> address = user.getAddresses().stream().filter(a -> a.getID() == addressID).findAny();
@@ -58,8 +60,9 @@ public class OrderService {
         return order;
     }
 
-    public List<Order> getOrders(long userID) {
-        User user = userService.getUser(userID);
+    public List<Order> getOrders() {
+        User user = userService.getCurrentUser();
+
         if(user == null) {
             throw new UserNotFoundException("User not found for given ID");
         }
@@ -68,6 +71,13 @@ public class OrderService {
     }
 
     public Order getOrder(long orderID) {
-        return orderRepository.findOne(orderID);
+        Order order = orderRepository.findOne(orderID);
+        User user = userService.getCurrentUser();
+
+        if(order.getUser().getID() == user.getID() || user.isAdmin()) {
+            return order;
+        }
+
+        return null;
     }
 }
