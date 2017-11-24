@@ -1,5 +1,6 @@
 package pl.kflorczyk.onlineshopbackend.services;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -14,11 +15,20 @@ import java.util.Base64;
 
 @Service
 public class ImageService {
-    public static final String RESOURCE_PATH = "D:/OnlineShopSpring/";
     public static final String IMGS_PATH = "imgs/";
 
+    @Value("${resourceDirectory}")
+    private String resourceDirectory;
+
+    public ImageService() {
+        File absolute = new File(resourceDirectory + IMGS_PATH);
+        if(!absolute.exists()) {
+            absolute.mkdirs();
+        }
+    }
+
     public void saveImageBase64OnDisk(String base64, String imageName) {
-        File absolute = new File(RESOURCE_PATH + IMGS_PATH);
+        File absolute = new File(resourceDirectory + IMGS_PATH);
         if(!absolute.exists()) {
             absolute.mkdirs();
         }
@@ -31,12 +41,14 @@ public class ImageService {
             ImageIO.write(src, "png", destination);
         } catch (IOException e) {
             e.printStackTrace();
+
         }
     }
 
     public byte[] loadImageFromDisk(String imageName) {
-        File absolute = new File(RESOURCE_PATH + IMGS_PATH);
+        File absolute = new File(resourceDirectory + IMGS_PATH);
         Path path = Paths.get(absolute.toString()+"/"+imageName);
+
         byte[] bytes;
         try {
             bytes = Files.readAllBytes(path);
@@ -48,7 +60,7 @@ public class ImageService {
     }
 
     public void replaceImageBase64OnDisk(String base64, String imageName) {
-        File absolute = new File(RESOURCE_PATH + IMGS_PATH);
+        File absolute = new File(resourceDirectory + IMGS_PATH);
         File current = new File(absolute.getAbsolutePath()+"/"+imageName);
         current.delete();
 
