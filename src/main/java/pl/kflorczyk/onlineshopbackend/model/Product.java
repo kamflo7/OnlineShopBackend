@@ -31,11 +31,18 @@ public class Product {
     @JoinColumn(name = "product_id")
     private List<FeatureBag> featureBags = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "image_id")
+    @OneToOne
     private Image image;
 
-    public void addFeature(FeatureBag featureBag) throws UnsupportedOperationException {
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
+    public void addFeature(FeatureBag featureBag) {
         this.featureBags.add(featureBag);
     }
 
@@ -47,14 +54,6 @@ public class Product {
         this.amount = amount;
         this.description = description;
         this.categoryLogic = categoryLogic;
-    }
-
-    public Image getImage() {
-        return image;
-    }
-
-    public void setImage(Image image) {
-        this.image = image;
     }
 
     public String getName() {

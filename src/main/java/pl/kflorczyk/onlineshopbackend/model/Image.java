@@ -1,19 +1,33 @@
 package pl.kflorczyk.onlineshopbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Entity
+@JsonFilter("Image")
 public class Image {
-    private final String PREFIX = "img";
 
     @Id
     @GeneratedValue
     private long id;
 
-    public String getName() {
-        return String.format("%s%d.jpg", PREFIX, id);
+    @Lob
+    private byte[] data;
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public Image() { }

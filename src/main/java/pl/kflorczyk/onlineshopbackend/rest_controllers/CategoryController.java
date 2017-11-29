@@ -1,30 +1,38 @@
 package pl.kflorczyk.onlineshopbackend.rest_controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.*;
-import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTO;
-import pl.kflorczyk.onlineshopbackend.dto.FeatureDefinitionDTOEditable;
-import pl.kflorczyk.onlineshopbackend.dto.ProductDTO;
-import pl.kflorczyk.onlineshopbackend.dto.Tuple;
+import pl.kflorczyk.onlineshopbackend.dto.*;
 import pl.kflorczyk.onlineshopbackend.exceptions.*;
-import pl.kflorczyk.onlineshopbackend.model.CategoryLogic;
-import pl.kflorczyk.onlineshopbackend.model.CategoryView;
-import pl.kflorczyk.onlineshopbackend.model.Product;
+import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
+import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
+import pl.kflorczyk.onlineshopbackend.repositories.ProductRepository;
+import pl.kflorczyk.onlineshopbackend.repositories.UserRepository;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.Response;
 import pl.kflorczyk.onlineshopbackend.rest_controllers.responses.ResponseDetail;
 import pl.kflorczyk.onlineshopbackend.services.CategoryService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
+import pl.kflorczyk.onlineshopbackend.services.UserService;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor // WYEPIEPRZYC
 public class CategoryController {
 
     @Autowired
@@ -403,6 +411,8 @@ public class CategoryController {
         return result;
     }
 
+
+
     private FilterProvider getJSONFilters(Claimant claimant) {
         if(claimant == Claimant.MANY_PRODUCTS) {
             return new SimpleFilterProvider()
@@ -412,7 +422,8 @@ public class CategoryController {
                                     "visible", "filterable", "multipleValues", "name"))
                     .addFilter("FeatureBag", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept("featureGroup", "categoryLogic", "featureValueDefinitions"))
-                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll());
+                    .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll())
+                    .addFilter("Image", SimpleBeanPropertyFilter.filterOutAllExcept("id"));
         } else if(claimant == Claimant.ONE_PRODUCT) {
             return new SimpleFilterProvider()
                     .addFilter("Product", SimpleBeanPropertyFilter.serializeAll())
@@ -421,7 +432,8 @@ public class CategoryController {
                     .addFilter("FeatureValue", SimpleBeanPropertyFilter.serializeAll())
                     .addFilter("FeatureDefinition", SimpleBeanPropertyFilter.serializeAllExcept(
                             "featureGroup", "categoryLogic", "featureValueDefinitions"
-                    ));
+                    ))
+                    .addFilter("Image", SimpleBeanPropertyFilter.filterOutAllExcept("id"));
         } else if(claimant == Claimant.CATEGORY_LOGIC) {
             return new SimpleFilterProvider()
                     .addFilter("Product", SimpleBeanPropertyFilter.serializeAll())

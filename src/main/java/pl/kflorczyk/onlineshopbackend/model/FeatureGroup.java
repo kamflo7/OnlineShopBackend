@@ -26,6 +26,11 @@ public class FeatureGroup {
         this.name = name;
     }
 
+    public FeatureGroup(String name, CategoryLogic categoryLogic) {
+        this.name = name;
+        this.categoryLogic = categoryLogic;
+    }
+
     public long getId() {
         return id;
     }

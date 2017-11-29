@@ -13,6 +13,7 @@ import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.product_filters.ProductSortTranslator;
 import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
+import pl.kflorczyk.onlineshopbackend.repositories.ImageRepository;
 import pl.kflorczyk.onlineshopbackend.repositories.ProductRepository;
 import pl.kflorczyk.onlineshopbackend.validators.ProductValidator;
 
@@ -27,7 +28,6 @@ public class ProductService {
     @NonNull private final CategoryLogicRepository categoryLogicRepository;
 
     @NonNull private final ProductValidator productValidator;
-    @NonNull private final ImageService imageService;
 
     public Tuple<BigDecimal> getPriceRange(long categoryID) {
         CategoryLogic categoryLogic = categoryLogicRepository.findOne(categoryID);
@@ -111,7 +111,7 @@ public class ProductService {
                             }
                         }
 
-                        if(matchParams != entry.getValue().size()) {
+                        if(matchParams == 0) {
                             return false;
                         }
                     } else {
@@ -129,6 +129,8 @@ public class ProductService {
 
         return true;
     }
+
+    @NonNull private final ImageRepository imageRepository;
 
     private Product createProduct(CategoryLogic categoryLogic, String name, String description, BigDecimal price, int amount, List<FeatureBagDTO> features, String image) {
         if(!productValidator.validateName(name)) {
@@ -148,13 +150,18 @@ public class ProductService {
             product.addFeature(featureBag);
         }
 
+        Image img = null;
         if(image != null) {
-            product.setImage(new Image());
+            byte[] decode = Base64.getDecoder().decode(image);
+            img = new Image();
+            img.setData(decode);
+
+            imageRepository.saveAndFlush(img);
         }
+
+        product.setImage(img);
         productRepository.saveAndFlush(product);
-        if(image != null) {
-            imageService.saveImageBase64OnDisk(image, product.getImage().getName());
-        }
+
         return product;
     }
 
@@ -221,20 +228,27 @@ public class ProductService {
             }
         }
 
+        Image newlyCreatedImage = null;
         if(data.getImage() != null) {
             if(product.getImage() != null) {
-                String imageName = product.getImage().getName();
-                imageService.replaceImageBase64OnDisk(data.getImage(), imageName);
-                productRepository.saveAndFlush(product);
+                Image image = imageRepository.findOne(product.getImage().getId());
+                byte[] decode = Base64.getDecoder().decode(data.getImage());
+                image.setData(decode);
+                imageRepository.saveAndFlush(image);
             } else {
-                product.setImage(new Image());
-                productRepository.saveAndFlush(product);
-                imageService.saveImageBase64OnDisk(data.getImage(), product.getImage().getName());
+                Image image = new Image();
+                byte[] decode = Base64.getDecoder().decode(data.getImage());
+                image.setData(decode);
+                imageRepository.saveAndFlush(image);
+                newlyCreatedImage = image;
             }
-        } else {
-            productRepository.saveAndFlush(product);
         }
 
+        if(newlyCreatedImage != null) {
+            product.setImage(newlyCreatedImage);
+        }
+
+        productRepository.saveAndFlush(product);
         return product;
     }
 

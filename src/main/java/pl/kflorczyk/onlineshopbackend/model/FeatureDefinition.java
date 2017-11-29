@@ -16,7 +16,7 @@ public class FeatureDefinition {
     @GeneratedValue
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // todo: for sure it has appropriate cascade type?
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feature_group_id")
     private FeatureGroup featureGroup;
 
@@ -39,8 +39,6 @@ public class FeatureDefinition {
 
     private boolean visibleInList;
 
-    // not the best ofc, but don't have enough time to redesign FilterParameters logic, so this is temporary solution
-    // todo: dummy solution, don't have enough time, fix later
     @Transient
     @JsonIgnore
     private boolean dummyPriceFilter;
@@ -137,6 +135,10 @@ public class FeatureDefinition {
 
     public void setFeatureValueDefinitions(List<FeatureValue> featureValueDefinitions) {
         this.featureValueDefinitions = featureValueDefinitions;
+    }
+
+    public void addFeatureValueDefinition(FeatureValue featureValue) {
+        featureValueDefinitions.add(featureValue);
     }
 
     @Override

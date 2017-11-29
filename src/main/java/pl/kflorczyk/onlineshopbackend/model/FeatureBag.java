@@ -54,16 +54,6 @@ public class FeatureBag {
         this.featureValues = featureValues;
     }
 
-    @Override
-    public String toString() {
-        String s = String.format("[%d:%s] -> [%d: ", featureDefinition.getId(), featureDefinition.getName(), this.id);
-        for(FeatureValue f : featureValues) {
-            s += f.getValue() + ";";
-        }
-        s += "]";
-        return s;
-    }
-
     public long getId() {
         return id;
     }
