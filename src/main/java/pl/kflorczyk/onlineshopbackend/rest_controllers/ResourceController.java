@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import pl.kflorczyk.onlineshopbackend.model.Image;
 import pl.kflorczyk.onlineshopbackend.repositories.ImageRepository;
-import pl.kflorczyk.onlineshopbackend.services.ImageService;
 
 @RestController
 @RequiredArgsConstructor

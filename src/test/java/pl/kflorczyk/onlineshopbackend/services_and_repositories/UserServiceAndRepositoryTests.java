@@ -15,6 +15,7 @@ import pl.kflorczyk.onlineshopbackend.model.CompanyAddress;
 import pl.kflorczyk.onlineshopbackend.model.User;
 import pl.kflorczyk.onlineshopbackend.model.UserAddress;
 import pl.kflorczyk.onlineshopbackend.repositories.UserRepository;
+import pl.kflorczyk.onlineshopbackend.services.JwtService;
 import pl.kflorczyk.onlineshopbackend.services.UserService;
 import pl.kflorczyk.onlineshopbackend.validators.EmailValidator;
 import pl.kflorczyk.onlineshopbackend.validators.UserAddressValidator;
@@ -38,7 +39,7 @@ public class UserServiceAndRepositoryTests {
 
     @Before
     public void setup() {
-        userService = new UserService(userRepository, passwordEncoder, new EmailValidator(), new UserAddressValidator());
+        userService = new UserService(userRepository, passwordEncoder, new EmailValidator(), new UserAddressValidator(), new JwtService(userRepository));
         passwordEncoder = new BCryptPasswordEncoder(11);
     }
 

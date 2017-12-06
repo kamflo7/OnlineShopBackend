@@ -16,9 +16,9 @@ import pl.kflorczyk.onlineshopbackend.model.*;
 import pl.kflorczyk.onlineshopbackend.product_filters.FilterParameters;
 import pl.kflorczyk.onlineshopbackend.repositories.CategoryLogicRepository;
 import pl.kflorczyk.onlineshopbackend.repositories.CategoryViewRepository;
+import pl.kflorczyk.onlineshopbackend.repositories.ImageRepository;
 import pl.kflorczyk.onlineshopbackend.repositories.ProductRepository;
 import pl.kflorczyk.onlineshopbackend.services.CategoryService;
-import pl.kflorczyk.onlineshopbackend.services.ImageService;
 import pl.kflorczyk.onlineshopbackend.services.ProductService;
 import pl.kflorczyk.onlineshopbackend.validators.CategoryValidator;
 import pl.kflorczyk.onlineshopbackend.validators.FeatureGroupValidator;
@@ -46,6 +46,9 @@ public class ProductAndCategoryTests {
     @Autowired
     private CategoryViewRepository categoryViewRepository;
 
+    @Autowired
+    private ImageRepository imageRepository;
+
     private ProductService productService;
     private CategoryService categoryService;
 
@@ -54,7 +57,7 @@ public class ProductAndCategoryTests {
         categoryService = new CategoryService(categoryViewRepository, categoryLogicRepository,
                 new CategoryValidator(), new FeatureGroupValidator(), new SimpleNameValidator());
 
-        productService = new ProductService(productRepository, categoryLogicRepository, new ProductValidator(), new ImageService());
+        productService = new ProductService(productRepository, categoryLogicRepository, new ProductValidator(), imageRepository);
     }
 
     public void setupDatabaseStructure() {
@@ -104,7 +107,7 @@ public class ProductAndCategoryTests {
         FeatureValue[] inchesR= new FeatureValue[] { screenRange6plus, screenRange48_54, screenRange41_47, screenRange55_6, screenRange48_54};
         FeatureValue[] res =    new FeatureValue[] { res2960x1440, res1280x720, res1280x720, res1280x720, res1920x1080};
 
-        List<List<FeatureValue>> cn= Lists.newArrayList(
+        List<List<FeatureValue>> cn = Lists.newArrayList(
                 Lists.newArrayList(connNfc, connBt42, connWifi),
                 Lists.newArrayList(connBt42),
                 Lists.newArrayList(connWifi),

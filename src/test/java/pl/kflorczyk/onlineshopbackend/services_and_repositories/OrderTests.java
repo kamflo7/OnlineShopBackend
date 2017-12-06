@@ -43,7 +43,7 @@ public class OrderTests {
 
     @Test
     public void makeOrderTest() {
-        User user = new User(1, "john.doe@gmail.com", "123456");
+        User user = new User("john.doe@gmail.com", "123456");
         Mockito.when(userService.getUser(1L)).thenReturn(user);
 
         UserAddress address = new PersonAddress("John", "Doe");
@@ -70,7 +70,7 @@ public class OrderTests {
         productsDTO.add(new OrderProductDTO(11, 1));
         Order order = null;
         try {
-            order = orderService.makeOrder(1L, 2L, "Courier", "Payment in advance", productsDTO);
+            order = orderService.makeOrder(1L, "Courier", "In advance", productsDTO);
         } catch(Exception e) {
             fail("Failed because caught exception ");
         }
